@@ -1,0 +1,210 @@
+const translations = {
+  en: {
+    app: {
+      name: "Pulse",
+      currentState: "Current state",
+      actionsTodayOne: "action today",
+      actionsTodayOther: "actions today",
+    },
+    nav: {
+      home: "Home",
+      history: "History",
+      settings: "Settings",
+    },
+    state: {
+      STOPPED: {
+        label: "Stopped",
+        tone: "blocked, low energy",
+        prompt: "Start with the smallest possible movement.",
+      },
+      NEUTRAL: {
+        label: "Neutral",
+        tone: "available, not yet engaged",
+        prompt: "Choose one light action to create traction.",
+      },
+      ACTIVE: {
+        label: "Active",
+        tone: "engaged, ready to act",
+        prompt: "Protect the momentum with a focused next step.",
+      },
+    },
+    suggestions: {
+      heading: "Suggested actions",
+      cta: "Try a small action",
+      close: "Close actions",
+      searchPlaceholder: "Search or type your own action",
+      addCustom: "Log this action",
+      noMatches: "No matching suggestions",
+      mode: "{state} mode",
+      quickAction: "Quick action {number}",
+      done: "Done",
+      log: "Log",
+      "stopped-breathe": "Take three slow breaths and put both feet on the floor.",
+      "stopped-water": "Drink a glass of water or fill one now.",
+      "stopped-open-space": "Clear one small surface within arm's reach.",
+      "neutral-pick-one": "Write down one task that would make today easier.",
+      "neutral-two-minute": "Set a two-minute timer and begin the easiest part.",
+      "neutral-prepare": "Put the next tool or document directly in front of you.",
+      "active-focus": "Work on one task for ten uninterrupted minutes.",
+      "active-finish-line": "Define the next visible finish line before continuing.",
+      "active-share": "Send a quick progress update or mark the task status.",
+    },
+    onboarding: {
+      title: "Start tiny.",
+      body: "Log one action and the app will update your state automatically.",
+    },
+    history: {
+      title: "History",
+      subtitle: "Your recent actions.",
+      emptyTitle: "Nothing logged yet",
+      emptyBody: "Tap a quick action on Home and it will show up here.",
+      showMore: "Show {count} more",
+      completedActions: "{count} completed actions",
+      stateTransitions: "{count} state transitions",
+    },
+    settings: {
+      title: "Settings",
+      subtitle: "Tune Pulse to your taste.",
+      notifications: "Notifications",
+      enableNotifications: "Enable notifications",
+      tone: "Tone",
+      soft: "Soft",
+      direct: "Direct",
+      feedback: "Feedback",
+      haptics: "Haptics",
+      enableHaptics: "Enable haptics",
+      appearance: "Appearance",
+      system: "System",
+      light: "Light",
+      dark: "Dark",
+      reset: "Reset all data",
+      version: "Pulse · v1.0",
+    },
+    feedback: {
+      dismiss: "Dismiss",
+      completed: "Action completed. State recalculated from your latest report.",
+      reset: "All local data has been reset.",
+      missingAction: "That action no longer exists for the current state.",
+    },
+    loading: {
+      label: "Behavior activation",
+      title: "Restoring your local session",
+    },
+  },
+  pt: {
+    app: {
+      name: "Pulse",
+      currentState: "Estado atual",
+      actionsTodayOne: "ação hoje",
+      actionsTodayOther: "ações hoje",
+    },
+    nav: {
+      home: "Início",
+      history: "Histórico",
+      settings: "Ajustes",
+    },
+    state: {
+      STOPPED: {
+        label: "Parado",
+        tone: "bloqueado, pouca energia",
+        prompt: "Comece pelo menor movimento possível.",
+      },
+      NEUTRAL: {
+        label: "Neutro",
+        tone: "disponível, ainda sem engajamento",
+        prompt: "Escolha uma ação leve para criar tração.",
+      },
+      ACTIVE: {
+        label: "Ativo",
+        tone: "engajado, pronto para agir",
+        prompt: "Proteja o embalo com um proximo passo claro.",
+      },
+    },
+    suggestions: {
+      heading: "Ações sugeridas",
+      cta: "Tentar uma pequena ação",
+      close: "Fechar ações",
+      searchPlaceholder: "Busque ou digite sua própria ação",
+      addCustom: "Registrar esta ação",
+      noMatches: "Nenhuma sugestão encontrada",
+      mode: "modo {state}",
+      quickAction: "Ação rápida {number}",
+      done: "Feito",
+      log: "Registrar",
+      "stopped-breathe": "Respire fundo tres vezes e apoie os pes no chao.",
+      "stopped-water": "Beba um copo de agua ou encha um agora.",
+      "stopped-open-space": "Organize uma pequena area ao alcance da mao.",
+      "neutral-pick-one": "Escreva uma tarefa que deixaria o dia mais facil.",
+      "neutral-two-minute": "Coloque um timer de dois minutos e comece pela parte mais facil.",
+      "neutral-prepare": "Coloque a próxima ferramenta ou documento na sua frente.",
+      "active-focus": "Trabalhe em uma tarefa por dez minutos sem interrupção.",
+      "active-finish-line": "Defina a próxima linha de chegada visível antes de continuar.",
+      "active-share": "Envie uma atualização rápida ou marque o status da tarefa.",
+    },
+    onboarding: {
+      title: "Comece pequeno.",
+      body: "Registre uma ação e o app atualiza seu estado automaticamente.",
+    },
+    history: {
+      title: "Histórico",
+      subtitle: "Suas ações recentes.",
+      emptyTitle: "Nada registrado ainda",
+      emptyBody: "Toque em uma ação rápida no Início e ela aparecerá aqui.",
+      showMore: "Mostrar mais {count}",
+      completedActions: "{count} ações concluídas",
+      stateTransitions: "{count} transições de estado",
+    },
+    settings: {
+      title: "Ajustes",
+      subtitle: "Adapte o Pulse ao seu gosto.",
+      notifications: "Notificações",
+      enableNotifications: "Ativar notificações",
+      tone: "Tom",
+      soft: "Suave",
+      direct: "Direto",
+      feedback: "Feedback",
+      haptics: "Háptico",
+      enableHaptics: "Ativar háptico",
+      appearance: "Aparência",
+      system: "Sistema",
+      light: "Claro",
+      dark: "Escuro",
+      reset: "Redefinir dados",
+      version: "Pulse · v1.0",
+    },
+    feedback: {
+      dismiss: "Fechar",
+      completed: "Ação concluída. Estado recalculado pelo último registro.",
+      reset: "Todos os dados locais foram redefinidos.",
+      missingAction: "Essa ação não existe mais para o estado atual.",
+    },
+    loading: {
+      label: "Ativação comportamental",
+      title: "Restaurando sua sessão local",
+    },
+  },
+};
+
+export const detectLocale = () => {
+  const languages =
+    typeof navigator === "undefined"
+      ? []
+      : [...(navigator.languages || []), navigator.language].filter(Boolean);
+
+  return languages.some((language) => language.toLowerCase().startsWith("pt")) ? "pt" : "en";
+};
+
+export const createTranslator = (locale) => {
+  const dictionary = translations[locale] || translations.en;
+
+  return (key, values = {}) => {
+    const value = key.split(".").reduce((current, part) => current?.[part], dictionary);
+    const fallback = key.split(".").reduce((current, part) => current?.[part], translations.en);
+    const template = typeof value === "string" ? value : fallback || key;
+
+    return Object.entries(values).reduce(
+      (text, [name, replacement]) => text.replaceAll(`{${name}}`, String(replacement)),
+      template,
+    );
+  };
+};
