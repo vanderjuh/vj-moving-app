@@ -57,22 +57,11 @@ export function SuggestionList({
   const getSuggestionIcon = (suggestion) => {
     if (suggestion.source === "goal") return <TargetIcon />;
     if (suggestion.source === "work") return <BriefcaseIcon />;
+    if (suggestion.source === "profession") return <BriefcaseIcon />;
     if (suggestion.periods?.includes(currentPeriod)) return <ClockIcon />;
     return <SparklesIcon />;
   };
-  const orderedSuggestions = useMemo(() => {
-    const periodSuggestions = suggestions.filter((suggestion) =>
-      suggestion.periods?.includes(currentPeriod),
-    );
-    const anySuggestions = suggestions.filter((suggestion) => suggestion.periods?.includes("any"));
-
-    const seen = new Set();
-    return [...periodSuggestions, ...anySuggestions, ...suggestions].filter((suggestion) => {
-      if (seen.has(suggestion.id)) return false;
-      seen.add(suggestion.id);
-      return true;
-    });
-  }, [currentPeriod, suggestions]);
+  const orderedSuggestions = useMemo(() => suggestions, [suggestions]);
 
   const visibleSuggestions = useMemo(
     () =>

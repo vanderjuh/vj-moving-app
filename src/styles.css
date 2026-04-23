@@ -668,6 +668,15 @@ button:focus-visible {
   font-size: 1.18rem;
 }
 
+.settings-tabs-wrap {
+  margin-top: -8px;
+}
+
+.settings-tabs-wrap .segmented {
+  padding: 7px;
+  border-radius: 18px;
+}
+
 .settings-group {
   display: grid;
   gap: 14px;
@@ -881,6 +890,97 @@ button:focus-visible {
   display: grid;
   gap: 12px;
   padding: 18px;
+}
+
+.profession-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.profession-field {
+  display: grid;
+  gap: 8px;
+}
+
+.profession-field span {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.profession-input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0 10px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  font: inherit;
+}
+
+.profession-input:focus-visible {
+  outline: 3px solid rgba(203, 187, 138, 0.28);
+  outline-offset: 2px;
+}
+
+.profession-input::placeholder {
+  color: var(--muted);
+}
+
+.profession-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.35;
+}
+
+.suggestion-order-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.suggestion-order-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.35;
+}
+
+.suggestion-order-list {
+  display: grid;
+  gap: 10px;
+}
+
+.suggestion-order-field {
+  display: grid;
+  gap: 8px;
+}
+
+.suggestion-order-field span {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.suggestion-order-field select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0 10px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  font: inherit;
+}
+
+.suggestion-order-field select:focus-visible {
+  outline: 3px solid rgba(203, 187, 138, 0.28);
+  outline-offset: 2px;
 }
 
 .work-hours-grid {

@@ -16,6 +16,8 @@ export function useBehaviorApp() {
       appearance: "system",
       locale: "en",
       goal: "",
+      profession: "",
+      suggestionPriority: ["period", "profession", "goal"],
       workHours: {
         start: "09:00",
         end: "18:00",
@@ -66,6 +68,8 @@ export function useBehaviorApp() {
         state: appState.currentState,
         goal: appState.settings.goal,
         locale: appState.settings.locale,
+        profession: appState.settings.profession,
+        suggestionPriority: appState.settings.suggestionPriority,
         workHours: appState.settings.workHours,
       }),
     [
@@ -73,6 +77,8 @@ export function useBehaviorApp() {
       appState.history.length,
       appState.settings.goal,
       appState.settings.locale,
+      appState.settings.profession,
+      appState.settings.suggestionPriority,
       appState.settings.workHours,
     ],
   );

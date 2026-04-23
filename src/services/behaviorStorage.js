@@ -1,4 +1,9 @@
-import { STATES, SUGGESTIONS_BY_STATE } from "../data/suggestions";
+import {
+  DEFAULT_SUGGESTION_PRIORITY,
+  STATES,
+  SUGGESTION_PRIORITY_TYPES,
+  SUGGESTIONS_BY_STATE,
+} from "../data/suggestions";
 import { detectLocale } from "../i18n/translations";
 
 export const STORAGE_KEY = "behavior_app_v1";
@@ -10,6 +15,8 @@ const DEFAULT_SETTINGS = {
   appearance: "system",
   locale: detectLocale(),
   goal: "",
+  profession: "",
+  suggestionPriority: DEFAULT_SUGGESTION_PRIORITY,
   workHours: {
     start: "09:00",
     end: "18:00",
@@ -22,6 +29,7 @@ const DEFAULT_STATE = {
   transitions: [],
   settings: DEFAULT_SETTINGS,
 };
+let memoryStateFallback = null;
 
 const ACTIVE_WINDOW_MS = 15 * 60 * 1000;
 const NEUTRAL_WINDOW_MS = 60 * 60 * 1000;
@@ -38,6 +46,7 @@ const isBrowserStorageAvailable = () => {
 };
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
+memoryStateFallback = clone(DEFAULT_STATE);
 
 const timestamp = () => new Date().toISOString();
 
@@ -93,6 +102,19 @@ const isTransition = (item) =>
 const normalizeSettings = (settings) => {
   const source = settings && typeof settings === "object" ? settings : {};
   const goal = typeof source.goal === "string" ? source.goal : "";
+  const profession = typeof source.profession === "string" ? source.profession : "";
+  const rawPriority = Array.isArray(source.suggestionPriority) ? source.suggestionPriority : [];
+  const seenPriority = new Set();
+  const validPriority = rawPriority.filter(
+    (item) =>
+      SUGGESTION_PRIORITY_TYPES.includes(item) &&
+      !seenPriority.has(item) &&
+      seenPriority.add(item),
+  );
+  const suggestionPriority = [
+    ...validPriority,
+    ...DEFAULT_SUGGESTION_PRIORITY.filter((item) => !validPriority.includes(item)),
+  ];
   const workHoursSource = source.workHours && typeof source.workHours === "object" ? source.workHours : {};
   const isValidTime = (value) => typeof value === "string" && /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
   const start = isValidTime(workHoursSource.start)
@@ -123,6 +145,8 @@ const normalizeSettings = (settings) => {
       : DEFAULT_SETTINGS.appearance,
     locale: ["pt", "en"].includes(source.locale) ? source.locale : DEFAULT_SETTINGS.locale,
     goal: goal.slice(0, 180),
+    profession: profession.slice(0, 80),
+    suggestionPriority,
     workHours: {
       start,
       end,
@@ -132,23 +156,19 @@ const normalizeSettings = (settings) => {
 
 const normalizeAppState = (data) => {
   if (!data || typeof data !== "object" || Array.isArray(data)) {
-    throw new Error("Stored data is not an object.");
+    return clone(DEFAULT_STATE);
   }
 
-  if (!isValidState(data.currentState)) {
-    throw new Error("Stored currentState is invalid.");
-  }
-
-  if (!Array.isArray(data.history) || !Array.isArray(data.transitions)) {
-    throw new Error("Stored lists are invalid.");
-  }
-
-  const history = data.history.filter(isHistoryItem);
+  const history = Array.isArray(data.history) ? data.history.filter(isHistoryItem) : [];
+  const currentState = isValidState(data.currentState)
+    ? data.currentState
+    : deriveStateFromHistory(history);
+  const transitions = Array.isArray(data.transitions) ? data.transitions.filter(isTransition) : [];
 
   return {
-    currentState: isValidState(data.currentState) ? data.currentState : deriveStateFromHistory(history),
+    currentState,
     history,
-    transitions: data.transitions.filter(isTransition),
+    transitions,
     settings: normalizeSettings(data.settings),
   };
 };
@@ -177,22 +197,27 @@ const withDerivedState = (data) => {
 
 const readRawState = () => {
   if (!isBrowserStorageAvailable()) {
-    return { data: clone(DEFAULT_STATE), warning: "Local storage is unavailable." };
+    return { data: clone(memoryStateFallback), warning: "Local storage is unavailable." };
   }
 
   const raw = window.localStorage.getItem(STORAGE_KEY);
 
   if (!raw) {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_STATE));
+    const safeDefaultState = clone(DEFAULT_STATE);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(safeDefaultState));
+    memoryStateFallback = safeDefaultState;
     return { data: clone(DEFAULT_STATE), warning: "" };
   }
 
   try {
     const data = withDerivedState(JSON.parse(raw));
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    memoryStateFallback = clone(data);
     return { data, warning: "" };
   } catch {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_STATE));
+    const safeDefaultState = clone(DEFAULT_STATE);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(safeDefaultState));
+    memoryStateFallback = safeDefaultState;
     return {
       data: clone(DEFAULT_STATE),
       warning: "Saved data was corrupted and has been reset safely.",
@@ -204,10 +229,12 @@ const writeRawState = (data) => {
   const normalized = withDerivedState(data);
 
   if (!isBrowserStorageAvailable()) {
-    throw new Error("Local storage is unavailable.");
+    memoryStateFallback = clone(normalized);
+    return clone(normalized);
   }
 
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+  memoryStateFallback = clone(normalized);
   return clone(normalized);
 };
 

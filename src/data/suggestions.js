@@ -1,4 +1,8 @@
+import { getProfessionSuggestions } from "./professions";
+
 export const STATES = ["STOPPED", "NEUTRAL", "ACTIVE"];
+export const SUGGESTION_PRIORITY_TYPES = ["period", "profession", "goal"];
+export const DEFAULT_SUGGESTION_PRIORITY = ["period", "profession", "goal"];
 
 export const STATE_META = {
   STOPPED: {
@@ -97,6 +101,33 @@ export const getSuggestionsForState = (state, now = new Date()) => {
     seen.add(item.id);
     return true;
   });
+};
+
+const getPeriodSuggestions = (state, now = new Date()) => {
+  const suggestions = SUGGESTIONS_BY_STATE[state] || [];
+  const currentPeriod = getDayPeriod(now);
+  const byPeriod = suggestions.filter((item) => item.periods?.includes(currentPeriod));
+  const anytime = suggestions.filter((item) => item.periods?.includes("any"));
+
+  const seen = new Set();
+  return [...byPeriod, ...anytime].filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+};
+
+const normalizeSuggestionPriority = (priority) => {
+  const raw = Array.isArray(priority) ? priority : [];
+  const seen = new Set();
+  const valid = raw.filter(
+    (item) => SUGGESTION_PRIORITY_TYPES.includes(item) && !seen.has(item) && seen.add(item),
+  );
+
+  return [
+    ...valid,
+    ...DEFAULT_SUGGESTION_PRIORITY.filter((item) => !valid.includes(item)),
+  ];
 };
 
 const parseTimeToMinutes = (time) => {
@@ -245,10 +276,10 @@ const getWorkHourSuggestions = (state, currentPeriod) => {
       {
         id: "neutral-work-001",
         state,
-        label: "Run a 25-minute focused work sprint.",
+        label: "Run a 15-minute focused work sprint.",
         labels: {
-          en: "Run a 25-minute focused work sprint.",
-          pt: "Faça um sprint de trabalho focado de 25 minutos.",
+          en: "Run a 15-minute focused work sprint.",
+          pt: "Faça um sprint de trabalho focado de 15 minutos.",
         },
         periods: [currentPeriod, "any"],
         source: "work",
@@ -297,15 +328,43 @@ export const getSuggestionsForContext = ({
   state,
   goal = "",
   locale = "en",
+  profession = "",
   workHours = { start: "09:00", end: "18:00" },
+  suggestionPriority = DEFAULT_SUGGESTION_PRIORITY,
   now = new Date(),
 }) => {
   const currentPeriod = getDayPeriod(now);
+  const safeProfession = typeof profession === "string" ? profession.trim() : "";
+  const priorityOrder = normalizeSuggestionPriority(suggestionPriority);
+  const isWorkTime = isWithinWorkHours(now, workHours);
+
   const base = getSuggestionsForState(state, now);
+  const periodSuggestions = getPeriodSuggestions(state, now);
   const goalSuggestions = getGoalSuggestions(state, goal, locale, currentPeriod);
-  const workHourSuggestions = isWithinWorkHours(now, workHours)
+  const professionSuggestions = safeProfession && isWorkTime
+    ? getProfessionSuggestions({
+        state,
+        profession: safeProfession,
+        currentPeriod,
+      })
+    : [];
+  const workHourSuggestions = safeProfession && isWorkTime
     ? getWorkHourSuggestions(state, currentPeriod)
     : [];
 
-  return [...goalSuggestions, ...workHourSuggestions, ...base];
+  const suggestionsByType = {
+    period: periodSuggestions,
+    profession: [...professionSuggestions, ...workHourSuggestions],
+    goal: goalSuggestions,
+  };
+
+  const orderedGroups = priorityOrder.flatMap((type) => suggestionsByType[type] || []);
+  const allSuggestions = [...orderedGroups, ...base];
+
+  const seen = new Set();
+  return allSuggestions.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
 };
