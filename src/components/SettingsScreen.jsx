@@ -1,32 +1,7 @@
 import { useEffect, useState } from "react";
+import { Bell, Smartphone, Trash2 } from "lucide-react";
 import { getProfessionOptions, resolveProfessionLabels } from "../data/professions";
 import { DEFAULT_SUGGESTION_PRIORITY, SUGGESTION_PRIORITY_TYPES } from "../data/suggestions";
-
-function BellIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M6.8 10.2a5.2 5.2 0 0 1 10.4 0v4.1l1.6 2.2H5.2l1.6-2.2v-4.1Z" />
-      <path d="M10.2 19a2 2 0 0 0 3.6 0" />
-    </svg>
-  );
-}
-
-function PhoneIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M9 4h6v16H9z" />
-      <path d="M7 9 5.5 7.5M7 15l-1.5 1.5M17 9l1.5-1.5M17 15l1.5 1.5" />
-    </svg>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 7h14M10 11v6M14 11v6M8 7l1-3h6l1 3M7 7l1 14h8l1-14" />
-    </svg>
-  );
-}
 
 function Toggle({ checked, onChange, label }) {
   return (
@@ -230,7 +205,7 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
             <div className="settings-card">
               <div className="settings-row">
                 <span className="settings-icon">
-                  <BellIcon />
+                  <Bell aria-hidden="true" />
                 </span>
                 <strong>{t("settings.enableNotifications")}</strong>
                 <Toggle
@@ -258,7 +233,7 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
             <div className="settings-card single-row-card">
               <div className="settings-row">
                 <span className="settings-icon">
-                  <PhoneIcon />
+                  <Smartphone aria-hidden="true" />
                 </span>
                 <strong>{t("settings.haptics")}</strong>
                 <Toggle
@@ -298,7 +273,7 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
           </SettingsGroup>
 
           <button className="reset-button" type="button" onClick={onReset}>
-            <TrashIcon />
+            <Trash2 aria-hidden="true" />
             {t("settings.reset")}
           </button>
 

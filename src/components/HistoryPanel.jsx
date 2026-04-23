@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Sparkles } from "lucide-react";
 
 const INITIAL_VISIBLE_COUNT = 80;
 const PAGE_SIZE = 80;
@@ -25,9 +26,7 @@ export function HistoryPanel({ history, locale, t, transitions }) {
       {history.length === 0 ? (
         <div className="empty-history">
           <div className="empty-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 4v5.2M12 14.8V20M4 12h5.2M14.8 12H20M7.1 7.1l3.7 3.7M13.2 13.2l3.7 3.7M16.9 7.1l-3.7 3.7M10.8 13.2l-3.7 3.7" />
-            </svg>
+            <Sparkles aria-hidden="true" />
           </div>
           <strong>{t("history.emptyTitle")}</strong>
           <span>{t("history.emptyBody")}</span>

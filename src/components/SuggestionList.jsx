@@ -1,44 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { BriefcaseBusiness, Clock3, Sparkles, Target } from "lucide-react";
 import { getDayPeriod } from "../data/suggestions";
-
-function TargetIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="8" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-function BriefcaseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M9 6.5V5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5v1.5" />
-      <rect x="3.5" y="6.5" width="17" height="13" rx="2.5" />
-      <path d="M3.5 12h17M10 12.2h4" />
-    </svg>
-  );
-}
-
-function ClockIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="M12 7.5v5l3.5 2" />
-    </svg>
-  );
-}
-
-function SparklesIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="m12 4 1.6 3.4L17 9l-3.4 1.6L12 14l-1.6-3.4L7 9l3.4-1.6L12 4Z" />
-      <path d="m18.5 13 1 2.1 2.1 1-2.1 1-1 2.1-1-2.1-2.1-1 2.1-1 1-2.1Z" />
-      <path d="M6 14.5 6.8 16l1.5.8-1.5.8L6 19l-.8-1.4-1.5-.8 1.5-.8L6 14.5Z" />
-    </svg>
-  );
-}
 
 export function SuggestionList({
   currentState,
@@ -55,11 +17,11 @@ export function SuggestionList({
   const normalizedQuery = query.trim().toLowerCase();
   const getSuggestionLabel = (suggestion) => suggestion.labels?.[locale] || suggestion.label;
   const getSuggestionIcon = (suggestion) => {
-    if (suggestion.source === "goal") return <TargetIcon />;
-    if (suggestion.source === "work") return <BriefcaseIcon />;
-    if (suggestion.source === "profession") return <BriefcaseIcon />;
-    if (suggestion.periods?.includes(currentPeriod)) return <ClockIcon />;
-    return <SparklesIcon />;
+    if (suggestion.source === "goal") return <Target aria-hidden="true" />;
+    if (suggestion.source === "work") return <BriefcaseBusiness aria-hidden="true" />;
+    if (suggestion.source === "profession") return <BriefcaseBusiness aria-hidden="true" />;
+    if (suggestion.periods?.includes(currentPeriod)) return <Clock3 aria-hidden="true" />;
+    return <Sparkles aria-hidden="true" />;
   };
   const orderedSuggestions = useMemo(() => suggestions, [suggestions]);
 
