@@ -10,6 +10,10 @@ const DEFAULT_SETTINGS = {
   appearance: "system",
   locale: detectLocale(),
   goal: "",
+  workHours: {
+    start: "09:00",
+    end: "18:00",
+  },
 };
 
 const DEFAULT_STATE = {
@@ -89,6 +93,18 @@ const isTransition = (item) =>
 const normalizeSettings = (settings) => {
   const source = settings && typeof settings === "object" ? settings : {};
   const goal = typeof source.goal === "string" ? source.goal : "";
+  const workHoursSource = source.workHours && typeof source.workHours === "object" ? source.workHours : {};
+  const isValidTime = (value) => typeof value === "string" && /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
+  const start = isValidTime(workHoursSource.start)
+    ? workHoursSource.start
+    : isValidTime(source.workStart)
+      ? source.workStart
+      : DEFAULT_SETTINGS.workHours.start;
+  const end = isValidTime(workHoursSource.end)
+    ? workHoursSource.end
+    : isValidTime(source.workEnd)
+      ? source.workEnd
+      : DEFAULT_SETTINGS.workHours.end;
 
   return {
     notificationsEnabled:
@@ -107,6 +123,10 @@ const normalizeSettings = (settings) => {
       : DEFAULT_SETTINGS.appearance,
     locale: ["pt", "en"].includes(source.locale) ? source.locale : DEFAULT_SETTINGS.locale,
     goal: goal.slice(0, 180),
+    workHours: {
+      start,
+      end,
+    },
   };
 };
 

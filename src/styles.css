@@ -849,6 +849,53 @@ button:focus-visible {
   line-height: 1.35;
 }
 
+.work-hours-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.work-hours-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.work-time-field {
+  display: grid;
+  gap: 8px;
+}
+
+.work-time-field span {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.work-time-field input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0 10px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  font: inherit;
+}
+
+.work-time-field input:focus-visible {
+  outline: 3px solid rgba(203, 187, 138, 0.28);
+  outline-offset: 2px;
+}
+
+.work-hours-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.35;
+}
+
 .settings-note-card p {
   margin: 0;
   color: var(--muted);

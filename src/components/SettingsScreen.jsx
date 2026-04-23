@@ -90,6 +90,45 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
         </div>
       </SettingsGroup>
 
+      <SettingsGroup title={t("settings.workHours")}> 
+        <div className="settings-card work-hours-card">
+          <div className="work-hours-grid">
+            <label className="work-time-field">
+              <span>{t("settings.workStart")}</span>
+              <input
+                type="time"
+                value={settings.workHours?.start || "09:00"}
+                onChange={(event) =>
+                  onUpdateSettings({
+                    workHours: {
+                      ...(settings.workHours || {}),
+                      start: event.target.value,
+                    },
+                  })
+                }
+              />
+            </label>
+
+            <label className="work-time-field">
+              <span>{t("settings.workEnd")}</span>
+              <input
+                type="time"
+                value={settings.workHours?.end || "18:00"}
+                onChange={(event) =>
+                  onUpdateSettings({
+                    workHours: {
+                      ...(settings.workHours || {}),
+                      end: event.target.value,
+                    },
+                  })
+                }
+              />
+            </label>
+          </div>
+          <p>{t("settings.workHoursHint")}</p>
+        </div>
+      </SettingsGroup>
+
       <SettingsGroup title={t("settings.notifications")}>
         <div className="settings-card">
           <div className="settings-row">

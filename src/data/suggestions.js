@@ -98,6 +98,32 @@ export const getSuggestionsForState = (state, now = new Date()) => {
   });
 };
 
+const parseTimeToMinutes = (time) => {
+  if (typeof time !== "string" || !/^([01]\d|2[0-3]):([0-5]\d)$/.test(time)) {
+    return null;
+  }
+
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+};
+
+const isWithinWorkHours = (now, workHours) => {
+  const startMinutes = parseTimeToMinutes(workHours?.start);
+  const endMinutes = parseTimeToMinutes(workHours?.end);
+
+  if (startMinutes === null || endMinutes === null || startMinutes === endMinutes) {
+    return false;
+  }
+
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  if (startMinutes < endMinutes) {
+    return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+  }
+
+  return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
+};
+
 const createGoalSuggestion = (state, locale, goal, currentPeriod, idSuffix, enTemplate, ptTemplate) => ({
   id: `${state.toLowerCase()}-goal-${idSuffix}`,
   state,
@@ -184,10 +210,94 @@ const getGoalSuggestions = (state, goal, locale, currentPeriod) => {
   ];
 };
 
-export const getSuggestionsForContext = ({ state, goal = "", locale = "en", now = new Date() }) => {
+const getWorkHourSuggestions = (state, currentPeriod) => {
+  if (state === "STOPPED") {
+    return [
+      {
+        id: "stopped-work-001",
+        state,
+        label: "Open your top work task and do 2 focused minutes.",
+        labels: {
+          en: "Open your top work task and do 2 focused minutes.",
+          pt: "Abra sua principal tarefa de trabalho e faça 2 minutos de foco.",
+        },
+        periods: [currentPeriod, "any"],
+      },
+      {
+        id: "stopped-work-002",
+        state,
+        label: "List one priority and one next action for this work block.",
+        labels: {
+          en: "List one priority and one next action for this work block.",
+          pt: "Liste uma prioridade e uma próxima ação para este bloco de trabalho.",
+        },
+        periods: [currentPeriod, "any"],
+      },
+    ];
+  }
+
+  if (state === "NEUTRAL") {
+    return [
+      {
+        id: "neutral-work-001",
+        state,
+        label: "Run a 25-minute focused work sprint.",
+        labels: {
+          en: "Run a 25-minute focused work sprint.",
+          pt: "Faça um sprint de trabalho focado de 25 minutos.",
+        },
+        periods: [currentPeriod, "any"],
+      },
+      {
+        id: "neutral-work-002",
+        state,
+        label: "Close one pending work item before switching tasks.",
+        labels: {
+          en: "Close one pending work item before switching tasks.",
+          pt: "Feche uma pendência de trabalho antes de trocar de tarefa.",
+        },
+        periods: [currentPeriod, "any"],
+      },
+    ];
+  }
+
+  return [
+    {
+      id: "active-work-001",
+      state,
+      label: "Deliver one concrete work output now.",
+      labels: {
+        en: "Deliver one concrete work output now.",
+        pt: "Entregue agora um resultado concreto de trabalho.",
+      },
+      periods: [currentPeriod, "any"],
+    },
+    {
+      id: "active-work-002",
+      state,
+      label: "Record progress and define the next work checkpoint.",
+      labels: {
+        en: "Record progress and define the next work checkpoint.",
+        pt: "Registre o progresso e defina o próximo checkpoint de trabalho.",
+      },
+      periods: [currentPeriod, "any"],
+    },
+  ];
+};
+
+export const getSuggestionsForContext = ({
+  state,
+  goal = "",
+  locale = "en",
+  workHours = { start: "09:00", end: "18:00" },
+  now = new Date(),
+}) => {
   const currentPeriod = getDayPeriod(now);
   const base = getSuggestionsForState(state, now);
   const goalSuggestions = getGoalSuggestions(state, goal, locale, currentPeriod);
+  const workHourSuggestions = isWithinWorkHours(now, workHours)
+    ? getWorkHourSuggestions(state, currentPeriod)
+    : [];
 
-  return [...goalSuggestions, ...base];
+  return [...goalSuggestions, ...workHourSuggestions, ...base];
 };

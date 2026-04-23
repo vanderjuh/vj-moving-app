@@ -16,6 +16,10 @@ export function useBehaviorApp() {
       appearance: "system",
       locale: "en",
       goal: "",
+      workHours: {
+        start: "09:00",
+        end: "18:00",
+      },
     },
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -62,8 +66,15 @@ export function useBehaviorApp() {
         state: appState.currentState,
         goal: appState.settings.goal,
         locale: appState.settings.locale,
+        workHours: appState.settings.workHours,
       }),
-    [appState.currentState, appState.history.length, appState.settings.goal, appState.settings.locale],
+    [
+      appState.currentState,
+      appState.history.length,
+      appState.settings.goal,
+      appState.settings.locale,
+      appState.settings.workHours,
+    ],
   );
 
   const completeAction = (actionId, label, successMessage, missingActionMessage) => {
