@@ -365,6 +365,34 @@ button:focus-visible {
   line-height: 1.28;
 }
 
+.suggestion-main {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.suggestion-prefix-icon {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  margin-top: 1px;
+  border-radius: 999px;
+  color: var(--soft);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.suggestion-prefix-icon svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
 .suggestion-card .add-action-button,
 .load-more-button {
   min-height: 48px;

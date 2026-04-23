@@ -18,12 +18,13 @@ export const STATE_META = {
   },
 };
 
-const action = (state, id, en, pt, periods = ["any"]) => ({
+const action = (state, id, en, pt, periods = ["any"], source = "default") => ({
   id,
   state,
   label: en,
   labels: { en, pt },
   periods,
+  source,
 });
 
 export const DEFAULT_ACTIONS = [
@@ -133,6 +134,7 @@ const createGoalSuggestion = (state, locale, goal, currentPeriod, idSuffix, enTe
     pt: ptTemplate(goal),
   },
   periods: [currentPeriod, "any"],
+  source: "goal",
 });
 
 const getGoalSuggestions = (state, goal, locale, currentPeriod) => {
@@ -222,6 +224,7 @@ const getWorkHourSuggestions = (state, currentPeriod) => {
           pt: "Abra sua principal tarefa de trabalho e faça 2 minutos de foco.",
         },
         periods: [currentPeriod, "any"],
+        source: "work",
       },
       {
         id: "stopped-work-002",
@@ -232,6 +235,7 @@ const getWorkHourSuggestions = (state, currentPeriod) => {
           pt: "Liste uma prioridade e uma próxima ação para este bloco de trabalho.",
         },
         periods: [currentPeriod, "any"],
+        source: "work",
       },
     ];
   }
@@ -247,6 +251,7 @@ const getWorkHourSuggestions = (state, currentPeriod) => {
           pt: "Faça um sprint de trabalho focado de 25 minutos.",
         },
         periods: [currentPeriod, "any"],
+        source: "work",
       },
       {
         id: "neutral-work-002",
@@ -257,6 +262,7 @@ const getWorkHourSuggestions = (state, currentPeriod) => {
           pt: "Feche uma pendência de trabalho antes de trocar de tarefa.",
         },
         periods: [currentPeriod, "any"],
+        source: "work",
       },
     ];
   }
@@ -271,6 +277,7 @@ const getWorkHourSuggestions = (state, currentPeriod) => {
         pt: "Entregue agora um resultado concreto de trabalho.",
       },
       periods: [currentPeriod, "any"],
+      source: "work",
     },
     {
       id: "active-work-002",
@@ -281,6 +288,7 @@ const getWorkHourSuggestions = (state, currentPeriod) => {
         pt: "Registre o progresso e defina o próximo checkpoint de trabalho.",
       },
       periods: [currentPeriod, "any"],
+      source: "work",
     },
   ];
 };
