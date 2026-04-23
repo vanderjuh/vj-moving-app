@@ -97,3 +97,97 @@ export const getSuggestionsForState = (state, now = new Date()) => {
     return true;
   });
 };
+
+const createGoalSuggestion = (state, locale, goal, currentPeriod, idSuffix, enTemplate, ptTemplate) => ({
+  id: `${state.toLowerCase()}-goal-${idSuffix}`,
+  state,
+  label: enTemplate(goal),
+  labels: {
+    en: enTemplate(goal),
+    pt: ptTemplate(goal),
+  },
+  periods: [currentPeriod, "any"],
+});
+
+const getGoalSuggestions = (state, goal, locale, currentPeriod) => {
+  const safeGoal = typeof goal === "string" ? goal.trim().slice(0, 120) : "";
+
+  if (!safeGoal) {
+    return [];
+  }
+
+  if (state === "STOPPED") {
+    return [
+      createGoalSuggestion(
+        state,
+        locale,
+        safeGoal,
+        currentPeriod,
+        "001",
+        (value) => `Open your ${value} task and do only 2 minutes.`,
+        (value) => `Abra a tarefa de ${value} e faça apenas 2 minutos.`,
+      ),
+      createGoalSuggestion(
+        state,
+        locale,
+        safeGoal,
+        currentPeriod,
+        "002",
+        (value) => `Write one tiny next step for: ${value}.`,
+        (value) => `Escreva um próximo passo mínimo para: ${value}.`,
+      ),
+    ];
+  }
+
+  if (state === "NEUTRAL") {
+    return [
+      createGoalSuggestion(
+        state,
+        locale,
+        safeGoal,
+        currentPeriod,
+        "001",
+        (value) => `Break ${value} into 3 actionable steps.`,
+        (value) => `Quebre ${value} em 3 passos acionáveis.`,
+      ),
+      createGoalSuggestion(
+        state,
+        locale,
+        safeGoal,
+        currentPeriod,
+        "002",
+        (value) => `Complete the first step toward ${value}.`,
+        (value) => `Conclua o primeiro passo em direção a ${value}.`,
+      ),
+    ];
+  }
+
+  return [
+    createGoalSuggestion(
+      state,
+      locale,
+      safeGoal,
+      currentPeriod,
+      "001",
+      (value) => `Finish one concrete deliverable for ${value}.`,
+      (value) => `Finalize uma entrega concreta para ${value}.`,
+    ),
+    createGoalSuggestion(
+      state,
+      locale,
+      safeGoal,
+      currentPeriod,
+      "002",
+      (value) => `Prepare the next checkpoint for ${value}.`,
+      (value) => `Prepare o próximo checkpoint para ${value}.`,
+    ),
+  ];
+};
+
+export const getSuggestionsForContext = ({ state, goal = "", locale = "en", now = new Date() }) => {
+  const currentPeriod = getDayPeriod(now);
+  const base = getSuggestionsForState(state, now);
+  const goalSuggestions = getGoalSuggestions(state, goal, locale, currentPeriod);
+
+  return [...goalSuggestions, ...base];
+};

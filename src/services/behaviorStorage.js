@@ -9,6 +9,7 @@ const DEFAULT_SETTINGS = {
   hapticsEnabled: false,
   appearance: "system",
   locale: detectLocale(),
+  goal: "",
 };
 
 const DEFAULT_STATE = {
@@ -87,6 +88,7 @@ const isTransition = (item) =>
 
 const normalizeSettings = (settings) => {
   const source = settings && typeof settings === "object" ? settings : {};
+  const goal = typeof source.goal === "string" ? source.goal : "";
 
   return {
     notificationsEnabled:
@@ -104,6 +106,7 @@ const normalizeSettings = (settings) => {
       ? source.appearance
       : DEFAULT_SETTINGS.appearance,
     locale: ["pt", "en"].includes(source.locale) ? source.locale : DEFAULT_SETTINGS.locale,
+    goal: goal.slice(0, 180),
   };
 };
 

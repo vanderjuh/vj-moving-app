@@ -810,6 +810,45 @@ button:focus-visible {
   padding: 22px;
 }
 
+.objective-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.objective-input-wrap {
+  display: block;
+}
+
+.objective-input {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px 14px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  font: inherit;
+  line-height: 1.35;
+}
+
+.objective-input::placeholder {
+  color: var(--muted);
+}
+
+.objective-input:focus-visible {
+  outline: 3px solid rgba(203, 187, 138, 0.28);
+  outline-offset: 2px;
+}
+
+.objective-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.35;
+}
+
 .settings-note-card p {
   margin: 0;
   color: var(--muted);

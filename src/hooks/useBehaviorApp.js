@@ -1,5 +1,5 @@
 import { startTransition, useEffect, useMemo, useRef, useState } from "react";
-import { getSuggestionsForState } from "../data/suggestions";
+import { getSuggestionsForContext } from "../data/suggestions";
 import { behaviorStorage } from "../services/behaviorStorage";
 
 const STATE_REFRESH_MS = 30 * 1000;
@@ -14,6 +14,8 @@ export function useBehaviorApp() {
       notificationTone: "soft",
       hapticsEnabled: false,
       appearance: "system",
+      locale: "en",
+      goal: "",
     },
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -55,8 +57,13 @@ export function useBehaviorApp() {
   }, []);
 
   const suggestions = useMemo(
-    () => getSuggestionsForState(appState.currentState),
-    [appState.currentState, appState.history.length],
+    () =>
+      getSuggestionsForContext({
+        state: appState.currentState,
+        goal: appState.settings.goal,
+        locale: appState.settings.locale,
+      }),
+    [appState.currentState, appState.history.length, appState.settings.goal, appState.settings.locale],
   );
 
   const completeAction = (actionId, label, successMessage, missingActionMessage) => {

@@ -74,6 +74,22 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
         <p>{t("settings.subtitle")}</p>
       </div>
 
+      <SettingsGroup title={t("settings.objective")}>
+        <div className="settings-card objective-card">
+          <label className="objective-input-wrap">
+            <span className="sr-only">{t("settings.objective")}</span>
+            <textarea
+              className="objective-input"
+              value={settings.goal || ""}
+              placeholder={t("settings.objectivePlaceholder")}
+              maxLength={180}
+              onChange={(event) => onUpdateSettings({ goal: event.target.value })}
+            />
+          </label>
+          <p>{t("settings.objectiveHint")}</p>
+        </div>
+      </SettingsGroup>
+
       <SettingsGroup title={t("settings.notifications")}>
         <div className="settings-card">
           <div className="settings-row">
