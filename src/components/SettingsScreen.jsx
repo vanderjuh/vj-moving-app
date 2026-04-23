@@ -132,6 +132,19 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
         </div>
       </SettingsGroup>
 
+      <SettingsGroup title={t("settings.language")}>
+        <div className="settings-card appearance-card">
+          <SegmentedControl
+            options={[
+              { id: "pt", label: t("settings.portuguese") },
+              { id: "en", label: t("settings.english") },
+            ]}
+            value={settings.locale}
+            onChange={(locale) => onUpdateSettings({ locale })}
+          />
+        </div>
+      </SettingsGroup>
+
       <button className="reset-button" type="button" onClick={onReset}>
         <TrashIcon />
         {t("settings.reset")}

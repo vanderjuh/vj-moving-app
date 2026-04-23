@@ -31,8 +31,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState("home");
   const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
   const [systemAppearance, setSystemAppearance] = useState(() => getResolvedAppearance("system"));
-  const locale = useMemo(() => detectLocale(), []);
-  const t = useMemo(() => createTranslator(locale), [locale]);
+  const detectedLocale = useMemo(() => detectLocale(), []);
   const {
     appState,
     suggestions,
@@ -42,6 +41,8 @@ export default function App() {
     completedActionId,
     actions,
   } = useBehaviorApp();
+  const locale = appState.settings.locale || detectedLocale;
+  const t = useMemo(() => createTranslator(locale), [locale]);
 
   useEffect(() => {
     document.documentElement.lang = locale === "pt" ? "pt-BR" : "en";

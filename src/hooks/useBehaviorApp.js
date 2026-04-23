@@ -1,5 +1,5 @@
 import { startTransition, useEffect, useMemo, useRef, useState } from "react";
-import { SUGGESTIONS_BY_STATE } from "../data/suggestions";
+import { getSuggestionsForState } from "../data/suggestions";
 import { behaviorStorage } from "../services/behaviorStorage";
 
 const STATE_REFRESH_MS = 30 * 1000;
@@ -55,8 +55,8 @@ export function useBehaviorApp() {
   }, []);
 
   const suggestions = useMemo(
-    () => SUGGESTIONS_BY_STATE[appState.currentState] || [],
-    [appState.currentState],
+    () => getSuggestionsForState(appState.currentState),
+    [appState.currentState, appState.history.length],
   );
 
   const completeAction = (actionId, label, successMessage, missingActionMessage) => {

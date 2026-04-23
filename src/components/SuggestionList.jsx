@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { getDayPeriod } from "../data/suggestions";
 
 export function SuggestionList({
   currentState,
@@ -11,14 +12,29 @@ export function SuggestionList({
   onComplete,
 }) {
   const [query, setQuery] = useState("");
+  const currentPeriod = getDayPeriod(new Date());
   const normalizedQuery = query.trim().toLowerCase();
   const getSuggestionLabel = (suggestion) => suggestion.labels?.[locale] || suggestion.label;
+  const orderedSuggestions = useMemo(() => {
+    const periodSuggestions = suggestions.filter((suggestion) =>
+      suggestion.periods?.includes(currentPeriod),
+    );
+    const anySuggestions = suggestions.filter((suggestion) => suggestion.periods?.includes("any"));
+
+    const seen = new Set();
+    return [...periodSuggestions, ...anySuggestions, ...suggestions].filter((suggestion) => {
+      if (seen.has(suggestion.id)) return false;
+      seen.add(suggestion.id);
+      return true;
+    });
+  }, [currentPeriod, suggestions]);
+
   const visibleSuggestions = useMemo(
     () =>
-      suggestions.filter((suggestion) =>
+      orderedSuggestions.filter((suggestion) =>
         getSuggestionLabel(suggestion).toLowerCase().includes(normalizedQuery),
       ),
-    [locale, normalizedQuery, suggestions],
+    [locale, normalizedQuery, orderedSuggestions],
   );
   const canAddCustomAction = normalizedQuery.length > 0 && visibleSuggestions.length === 0;
 

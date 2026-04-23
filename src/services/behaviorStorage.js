@@ -1,4 +1,5 @@
 import { STATES, SUGGESTIONS_BY_STATE } from "../data/suggestions";
+import { detectLocale } from "../i18n/translations";
 
 export const STORAGE_KEY = "behavior_app_v1";
 
@@ -7,6 +8,7 @@ const DEFAULT_SETTINGS = {
   notificationTone: "soft",
   hapticsEnabled: false,
   appearance: "system",
+  locale: detectLocale(),
 };
 
 const DEFAULT_STATE = {
@@ -101,6 +103,7 @@ const normalizeSettings = (settings) => {
     appearance: ["system", "light", "dark"].includes(source.appearance)
       ? source.appearance
       : DEFAULT_SETTINGS.appearance,
+    locale: ["pt", "en"].includes(source.locale) ? source.locale : DEFAULT_SETTINGS.locale,
   };
 };
 
