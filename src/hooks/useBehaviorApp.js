@@ -1,5 +1,5 @@
 import { startTransition, useEffect, useMemo, useRef, useState } from "react";
-import { getSuggestionsForContext } from "../data/suggestions";
+import { DEFAULT_SUGGESTION_PRIORITY, getSuggestionsForContext } from "../data/suggestions";
 import { notificationService } from "../services/notificationService";
 import { behaviorStorage } from "../services/behaviorStorage";
 
@@ -19,7 +19,7 @@ export function useBehaviorApp() {
       locale: "en",
       goal: "",
       profession: "",
-      suggestionPriority: ["period", "profession", "goal"],
+      suggestionPriority: DEFAULT_SUGGESTION_PRIORITY,
       workHours: {
         start: "09:00",
         end: "18:00",

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Bell, Smartphone, Trash2 } from "lucide-react";
+import { featureFlags } from "../config/featureFlags";
 import { getProfessionOptions, resolveProfessionLabels } from "../data/professions";
 import { DEFAULT_SUGGESTION_PRIORITY, SUGGESTION_PRIORITY_TYPES } from "../data/suggestions";
 
@@ -52,10 +53,20 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
   const professionLabels = resolveProfessionLabels(settings.profession);
   const localizedProfessionValue =
     settings.locale === "en" ? professionLabels.en || settings.profession || "" : professionLabels.pt || settings.profession || "";
-  const suggestionPriority =
-    Array.isArray(settings.suggestionPriority) && settings.suggestionPriority.length > 0
-      ? settings.suggestionPriority
-      : DEFAULT_SUGGESTION_PRIORITY;
+  const rawSuggestionPriority = Array.isArray(settings.suggestionPriority)
+    ? settings.suggestionPriority
+    : [];
+  const seenPriority = new Set();
+  const validSuggestionPriority = rawSuggestionPriority.filter(
+    (item) =>
+      SUGGESTION_PRIORITY_TYPES.includes(item) &&
+      !seenPriority.has(item) &&
+      seenPriority.add(item),
+  );
+  const suggestionPriority = [
+    ...validSuggestionPriority,
+    ...DEFAULT_SUGGESTION_PRIORITY.filter((item) => !validSuggestionPriority.includes(item)),
+  ];
 
   useEffect(() => {
     const currentProfession = settings.profession || "";
@@ -66,6 +77,16 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
 
     onUpdateSettings({ profession: localizedProfessionValue });
   }, [localizedProfessionValue, onUpdateSettings, professionLabels.id, settings.profession]);
+
+  useEffect(() => {
+    const shouldNormalize =
+      !Array.isArray(settings.suggestionPriority) ||
+      settings.suggestionPriority.length !== suggestionPriority.length ||
+      settings.suggestionPriority.some((item, index) => item !== suggestionPriority[index]);
+
+    if (!shouldNormalize) return;
+    onUpdateSettings({ suggestionPriority });
+  }, [onUpdateSettings, settings.suggestionPriority, suggestionPriority]);
 
   const handleSuggestionPriorityChange = (position, value) => {
     const current = suggestionPriority.filter((item) => SUGGESTION_PRIORITY_TYPES.includes(item));
@@ -94,21 +115,23 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
 
       {activeTab === "context" ? (
         <>
-          <SettingsGroup title={t("settings.objective")}>
-            <div className="settings-card objective-card">
-              <label className="objective-input-wrap">
-                <span className="sr-only">{t("settings.objective")}</span>
-                <textarea
-                  className="objective-input"
-                  value={settings.goal || ""}
-                  placeholder={t("settings.objectivePlaceholder")}
-                  maxLength={180}
-                  onChange={(event) => onUpdateSettings({ goal: event.target.value })}
-                />
-              </label>
-              <p>{t("settings.objectiveHint")}</p>
-            </div>
-          </SettingsGroup>
+          {featureFlags.goalEnabled ? (
+            <SettingsGroup title={t("settings.objective")}>
+              <div className="settings-card objective-card">
+                <label className="objective-input-wrap">
+                  <span className="sr-only">{t("settings.objective")}</span>
+                  <textarea
+                    className="objective-input"
+                    value={settings.goal || ""}
+                    placeholder={t("settings.objectivePlaceholder")}
+                    maxLength={180}
+                    onChange={(event) => onUpdateSettings({ goal: event.target.value })}
+                  />
+                </label>
+                <p>{t("settings.objectiveHint")}</p>
+              </div>
+            </SettingsGroup>
+          ) : null}
 
           <SettingsGroup title={t("settings.profession")}>
             <div className="settings-card profession-card">

@@ -1,8 +1,13 @@
 import { getProfessionSuggestions } from "./professions";
+import { featureFlags } from "../config/featureFlags";
 
 export const STATES = ["STOPPED", "NEUTRAL", "ACTIVE"];
-export const SUGGESTION_PRIORITY_TYPES = ["period", "profession", "goal"];
-export const DEFAULT_SUGGESTION_PRIORITY = ["period", "profession", "goal"];
+export const SUGGESTION_PRIORITY_TYPES = featureFlags.goalEnabled
+  ? ["period", "profession", "goal"]
+  : ["period", "profession"];
+export const DEFAULT_SUGGESTION_PRIORITY = featureFlags.goalEnabled
+  ? ["period", "profession", "goal"]
+  : ["period", "profession"];
 
 export const STATE_META = {
   STOPPED: {
@@ -340,7 +345,9 @@ export const getSuggestionsForContext = ({
 
   const base = getSuggestionsForState(state, now);
   const periodSuggestions = getPeriodSuggestions(state, now);
-  const goalSuggestions = getGoalSuggestions(state, goal, locale, currentPeriod);
+  const goalSuggestions = featureFlags.goalEnabled
+    ? getGoalSuggestions(state, goal, locale, currentPeriod)
+    : [];
   const professionSuggestions = safeProfession && isWorkTime
     ? getProfessionSuggestions({
         state,
