@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Bell, Smartphone, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Bell, Download, Smartphone, Trash2, Upload } from "lucide-react";
 import { featureFlags } from "../config/featureFlags";
 import { getProfessionOptions, resolveProfessionLabels } from "../data/professions";
 import { DEFAULT_SUGGESTION_PRIORITY, SUGGESTION_PRIORITY_TYPES } from "../data/suggestions";
@@ -46,9 +46,10 @@ function SettingsGroup({ title, children }) {
   );
 }
 
-export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
+export function SettingsScreen({ settings, t, onReset, onUpdateSettings, onExportData, onImportData }) {
   const hasProfession = Boolean(settings.profession?.trim());
   const [activeTab, setActiveTab] = useState("context");
+  const importInputRef = useRef(null);
   const professionOptions = getProfessionOptions(settings.locale);
   const professionLabels = resolveProfessionLabels(settings.profession);
   const localizedProfessionValue =
@@ -95,6 +96,18 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
     onUpdateSettings({ suggestionPriority: withoutSelected });
   };
 
+  const handleExportData = () => {
+    if (typeof onExportData === "function") {
+      onExportData();
+    }
+  };
+
+  const handleImportData = async (file) => {
+    if (typeof onImportData === "function") {
+      await onImportData(file);
+    }
+  };
+
   return (
     <section className="screen settings-screen">
       <div className="screen-heading">
@@ -107,6 +120,9 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
           options={[
             { id: "context", label: t("settings.tabs.context") },
             { id: "preferences", label: t("settings.tabs.preferences") },
+            ...(featureFlags.dataPortabilityEnabled
+              ? [{ id: "data", label: t("settings.tabs.data") }]
+              : []),
           ]}
           value={activeTab}
           onChange={setActiveTab}
@@ -314,6 +330,43 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
           </button>
 
           <p className="app-version">✣ {t("settings.version")}</p>
+        </>
+      ) : null}
+
+      {featureFlags.dataPortabilityEnabled && activeTab === "data" ? (
+        <>
+          <SettingsGroup title={t("settings.dataPortability")}> 
+            <div className="settings-card data-portability-card">
+              <p>{t("settings.dataPortabilityHint")}</p>
+              <div className="data-actions">
+                <button className="data-action-button" type="button" onClick={handleExportData}>
+                  <Download aria-hidden="true" />
+                  {t("settings.exportData")}
+                </button>
+
+                <button
+                  className="data-action-button"
+                  type="button"
+                  onClick={() => importInputRef.current?.click()}
+                >
+                  <Upload aria-hidden="true" />
+                  {t("settings.importData")}
+                </button>
+
+                <input
+                  ref={importInputRef}
+                  className="data-import-input"
+                  type="file"
+                  accept="application/json,.json"
+                  onChange={async (event) => {
+                    const file = event.target.files?.[0];
+                    await handleImportData(file);
+                    event.target.value = "";
+                  }}
+                />
+              </div>
+            </div>
+          </SettingsGroup>
         </>
       ) : null}
     </section>

@@ -161,6 +161,19 @@ export default function App() {
           onReset={() =>
             actions.resetAppState(isDirectTone ? t("feedback.resetDirect") : t("feedback.resetSoft"))
           }
+          onExportData={() =>
+            actions.exportData(
+              isDirectTone ? t("feedback.exportDirect") : t("feedback.exportSoft"),
+              t("feedback.exportError"),
+            )
+          }
+          onImportData={(file) =>
+            actions.importData(
+              file,
+              isDirectTone ? t("feedback.importDirect") : t("feedback.importSoft"),
+              t("feedback.importError"),
+            )
+          }
           onUpdateSettings={actions.updateSettings}
         />
       </div>

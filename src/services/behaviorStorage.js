@@ -247,6 +247,28 @@ const findSuggestion = (actionId) =>
     .flat()
     .find((suggestion) => suggestion.id === actionId);
 
+const assertImportShape = (data) => {
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    throw new Error("Backup file is invalid.");
+  }
+
+  if (data.currentState !== undefined && !isValidState(data.currentState)) {
+    throw new Error("Backup file has invalid state.");
+  }
+
+  if (data.history !== undefined && !Array.isArray(data.history)) {
+    throw new Error("Backup file has invalid history.");
+  }
+
+  if (data.transitions !== undefined && !Array.isArray(data.transitions)) {
+    throw new Error("Backup file has invalid transitions.");
+  }
+
+  if (data.settings !== undefined && (typeof data.settings !== "object" || Array.isArray(data.settings))) {
+    throw new Error("Backup file has invalid settings.");
+  }
+};
+
 export const behaviorStorage = {
   getAppState() {
     const { data, warning } = readRawState();
@@ -254,6 +276,16 @@ export const behaviorStorage = {
   },
 
   saveAppState(data) {
+    return writeRawState(data);
+  },
+
+  exportAppState(baseState) {
+    const sourceState = baseState ? withDerivedState(baseState) : readRawState().data;
+    return clone(sourceState);
+  },
+
+  importAppState(data) {
+    assertImportShape(data);
     return writeRawState(data);
   },
 

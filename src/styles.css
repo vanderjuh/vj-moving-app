@@ -950,6 +950,52 @@ button:focus-visible {
   line-height: 1.35;
 }
 
+.data-portability-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.data-portability-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.35;
+}
+
+.data-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.data-action-button {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  font: inherit;
+  font-weight: 700;
+}
+
+.data-action-button svg {
+  width: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+}
+
+.data-import-input {
+  display: none;
+}
+
 .suggestion-order-list {
   display: grid;
   gap: 10px;
@@ -1326,9 +1372,14 @@ button:focus-visible {
 .phone-shell.ui-compact .work-hours-card,
 .phone-shell.ui-compact .profession-card,
 .phone-shell.ui-compact .suggestion-order-card,
+.phone-shell.ui-compact .data-portability-card,
 .phone-shell.ui-compact .appearance-card {
   gap: 10px;
   padding: 14px;
+}
+
+.phone-shell.ui-compact .data-action-button {
+  min-height: 42px;
 }
 
 .phone-shell.ui-compact .objective-input {

@@ -188,6 +188,54 @@ export function useBehaviorApp() {
     });
   };
 
+  const exportData = (successMessage, failureMessage) => {
+    try {
+      const snapshot = behaviorStorage.exportAppState(appState);
+      const payload = JSON.stringify(snapshot, null, 2);
+      const blob = new Blob([payload], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const now = new Date();
+      const safeTimestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}`;
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = `tinypush-backup-${safeTimestamp}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+
+      setNotice(successMessage || "");
+      setError("");
+      return true;
+    } catch (storageError) {
+      setError(failureMessage || storageError.message);
+      return false;
+    }
+  };
+
+  const importData = async (file, successMessage, failureMessage) => {
+    if (!file) {
+      setError(failureMessage || "Invalid backup file.");
+      return false;
+    }
+
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      const nextState = behaviorStorage.importAppState(parsed);
+
+      setAppState(nextState);
+      setCompletedActionId("");
+      setNotice(successMessage || "");
+      setError("");
+      return true;
+    } catch {
+      setError(failureMessage || "Invalid backup file.");
+      return false;
+    }
+  };
+
   return {
     appState,
     suggestions,
@@ -199,6 +247,8 @@ export function useBehaviorApp() {
       completeAction,
       updateSettings,
       resetAppState,
+      exportData,
+      importData,
       dismissError: () => setError(""),
       dismissNotice: () => setNotice(""),
     },
