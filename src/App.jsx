@@ -85,6 +85,7 @@ export default function App() {
   const resolvedDensity = appState.settings.uiDensity || "compact";
   const notificationTone = appState.settings.notificationTone || "soft";
   const isDirectTone = notificationTone === "direct";
+  const notificationsEnabled = appState.settings.notificationsEnabled === true;
 
   const handleTabChange = (tab) => {
     setIsActionSheetOpen(false);
@@ -98,7 +99,7 @@ export default function App() {
       <FeedbackBanner
         error={error}
         notice={notice}
-        updateAction={applyPwaUpdate}
+        updateAction={notificationsEnabled ? applyPwaUpdate : null}
         updateMessage={
           isDirectTone ? t("feedback.updateAvailableDirect") : t("feedback.updateAvailableSoft")
         }

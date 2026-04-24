@@ -88,11 +88,6 @@ export function useBehaviorApp() {
   const completeAction = (actionId, label, successMessage, missingActionMessage) => {
     const suggestion = suggestions.find((item) => item.id === actionId);
     const safeLabel = typeof label === "string" ? label.trim() : "";
-    const notificationSettings = {
-      enabled: appState.settings.notificationsEnabled,
-      tone: appState.settings.notificationTone,
-      locale: appState.settings.locale,
-    };
 
     if (!suggestion && !safeLabel) {
       setError(missingActionMessage || "That action no longer exists for the current state.");
@@ -102,6 +97,11 @@ export function useBehaviorApp() {
     setAppState((current) => {
       try {
         const completedLabel = safeLabel || suggestion?.label || "";
+        const notificationSettings = {
+          enabled: current.settings.notificationsEnabled,
+          tone: current.settings.notificationTone,
+          locale: current.settings.locale,
+        };
         const nextState = behaviorStorage.addAction(
           {
             actionId: suggestion?.id || `custom-${crypto.randomUUID()}`,
@@ -112,7 +112,7 @@ export function useBehaviorApp() {
 
         setCompletedActionId(suggestion?.id || "");
         window.setTimeout(() => setCompletedActionId(""), 900);
-        setNotice(successMessage || "");
+        setNotice(notificationSettings.enabled ? successMessage || "" : "");
         setError("");
 
         if (notificationSettings.enabled && completedLabel) {
@@ -161,28 +161,31 @@ export function useBehaviorApp() {
   };
 
   const resetAppState = (successMessage) => {
-    const notificationSettings = {
-      enabled: appState.settings.notificationsEnabled,
-      tone: appState.settings.notificationTone,
-      locale: appState.settings.locale,
-    };
+    setAppState((current) => {
+      try {
+        const notificationSettings = {
+          enabled: current.settings.notificationsEnabled,
+          tone: current.settings.notificationTone,
+          locale: current.settings.locale,
+        };
+        const nextState = behaviorStorage.resetAppState();
+        setCompletedActionId("");
+        setNotice(notificationSettings.enabled ? successMessage || "" : "");
+        setError("");
 
-    try {
-      const nextState = behaviorStorage.resetAppState();
-      setAppState(nextState);
-      setCompletedActionId("");
-      setNotice(successMessage || "");
-      setError("");
+        if (notificationSettings.enabled) {
+          notificationService.notifyReset({
+            locale: notificationSettings.locale,
+            tone: notificationSettings.tone,
+          });
+        }
 
-      if (notificationSettings.enabled) {
-        notificationService.notifyReset({
-          locale: notificationSettings.locale,
-          tone: notificationSettings.tone,
-        });
+        return nextState;
+      } catch (storageError) {
+        setError(storageError.message);
+        return current;
       }
-    } catch (storageError) {
-      setError(storageError.message);
-    }
+    });
   };
 
   return {
