@@ -116,7 +116,7 @@ const translations = {
       workEnd: "End",
       workHoursHint: "Work-focused suggestions are shown during this time window.",
       reset: "Reset all data",
-      version: "TinyPush · v1.0",
+      version: "TinyPush · v1.0.2",
     },
     feedback: {
       dismiss: "Dismiss",
@@ -254,7 +254,7 @@ const translations = {
       workEnd: "Fim",
       workHoursHint: "Sugestões focadas em trabalho aparecem dentro dessa janela de horário.",
       reset: "Redefinir dados",
-      version: "TinyPush · v1.0",
+      version: "TinyPush · v1.0.2",
     },
     feedback: {
       dismiss: "Fechar",
