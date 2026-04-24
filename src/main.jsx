@@ -5,8 +5,17 @@ import { registerSW } from "virtual:pwa-register";
 import App from "./App.jsx";
 import "./styles.css";
 
-registerSW({
+const updateSW = registerSW({
   immediate: true,
+  onNeedRefresh() {
+    window.dispatchEvent(
+      new CustomEvent("pulse:pwa-update-ready", {
+        detail: {
+          applyUpdate: () => updateSW(true),
+        },
+      }),
+    );
+  },
 });
 
 createRoot(document.getElementById("root")).render(

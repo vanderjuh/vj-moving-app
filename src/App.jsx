@@ -31,6 +31,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState("home");
   const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
   const [systemAppearance, setSystemAppearance] = useState(() => getResolvedAppearance("system"));
+  const [applyPwaUpdate, setApplyPwaUpdate] = useState(null);
   const detectedLocale = useMemo(() => detectLocale(), []);
   const {
     appState,
@@ -55,6 +56,17 @@ export default function App() {
     updateAppearance();
     media.addEventListener("change", updateAppearance);
     return () => media.removeEventListener("change", updateAppearance);
+  }, []);
+
+  useEffect(() => {
+    const handlePwaUpdateReady = (event) => {
+      const nextApplyUpdate = event.detail?.applyUpdate;
+      if (typeof nextApplyUpdate !== "function") return;
+      setApplyPwaUpdate(() => nextApplyUpdate);
+    };
+
+    window.addEventListener("pulse:pwa-update-ready", handlePwaUpdateReady);
+    return () => window.removeEventListener("pulse:pwa-update-ready", handlePwaUpdateReady);
   }, []);
 
   if (isLoading) {
@@ -83,6 +95,9 @@ export default function App() {
       <FeedbackBanner
         error={error}
         notice={notice}
+        updateAction={applyPwaUpdate}
+        updateMessage={t("feedback.updateAvailable")}
+        updateLabel={t("feedback.updateNow")}
         t={t}
         onDismissError={actions.dismissError}
         onDismissNotice={actions.dismissNotice}

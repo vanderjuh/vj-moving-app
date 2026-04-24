@@ -120,6 +120,8 @@ const translations = {
       completed: "Action completed. State recalculated from your latest report.",
       reset: "All local data has been reset.",
       missingAction: "That action no longer exists for the current state.",
+      updateAvailable: "A new version is ready.",
+      updateNow: "Update",
     },
     loading: {
       label: "Behavior activation",
@@ -247,6 +249,8 @@ const translations = {
       completed: "Ação concluída. Estado recalculado pelo último registro.",
       reset: "Todos os dados locais foram redefinidos.",
       missingAction: "Essa ação não existe mais para o estado atual.",
+      updateAvailable: "Uma nova versão está pronta.",
+      updateNow: "Atualizar",
     },
     loading: {
       label: "Ativação comportamental",
