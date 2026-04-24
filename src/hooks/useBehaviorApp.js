@@ -1,5 +1,6 @@
 import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import { getSuggestionsForContext } from "../data/suggestions";
+import { notificationService } from "../services/notificationService";
 import { behaviorStorage } from "../services/behaviorStorage";
 
 const STATE_REFRESH_MS = 30 * 1000;
@@ -87,6 +88,11 @@ export function useBehaviorApp() {
   const completeAction = (actionId, label, successMessage, missingActionMessage) => {
     const suggestion = suggestions.find((item) => item.id === actionId);
     const safeLabel = typeof label === "string" ? label.trim() : "";
+    const notificationSettings = {
+      enabled: appState.settings.notificationsEnabled,
+      tone: appState.settings.notificationTone,
+      locale: appState.settings.locale,
+    };
 
     if (!suggestion && !safeLabel) {
       setError(missingActionMessage || "That action no longer exists for the current state.");
@@ -95,10 +101,11 @@ export function useBehaviorApp() {
 
     setAppState((current) => {
       try {
+        const completedLabel = safeLabel || suggestion?.label || "";
         const nextState = behaviorStorage.addAction(
           {
             actionId: suggestion?.id || `custom-${crypto.randomUUID()}`,
-            label: safeLabel || suggestion.label,
+            label: completedLabel,
           },
           current,
         );
@@ -107,6 +114,15 @@ export function useBehaviorApp() {
         window.setTimeout(() => setCompletedActionId(""), 900);
         setNotice(successMessage || "");
         setError("");
+
+        if (notificationSettings.enabled && completedLabel) {
+          notificationService.notifyActionCompleted({
+            locale: notificationSettings.locale,
+            tone: notificationSettings.tone,
+            label: completedLabel,
+          });
+        }
+
         return nextState;
       } catch (storageError) {
         setError(storageError.message);
@@ -118,6 +134,11 @@ export function useBehaviorApp() {
   };
 
   const updateSettings = (settings) => {
+    const isEnablingNotifications =
+      settings.notificationsEnabled === true && appState.settings.notificationsEnabled !== true;
+    const tone = settings.notificationTone || appState.settings.notificationTone;
+    const locale = settings.locale || appState.settings.locale;
+
     setAppState((current) => {
       try {
         const nextState = behaviorStorage.updateSettings(settings, current);
@@ -128,15 +149,37 @@ export function useBehaviorApp() {
         return current;
       }
     });
+
+    if (isEnablingNotifications) {
+      notificationService.requestPermission().then((status) => {
+        const message = notificationService.getPermissionFeedbackMessage({ locale, tone, status });
+        if (message) {
+          setNotice(message);
+        }
+      });
+    }
   };
 
   const resetAppState = (successMessage) => {
+    const notificationSettings = {
+      enabled: appState.settings.notificationsEnabled,
+      tone: appState.settings.notificationTone,
+      locale: appState.settings.locale,
+    };
+
     try {
       const nextState = behaviorStorage.resetAppState();
       setAppState(nextState);
       setCompletedActionId("");
       setNotice(successMessage || "");
       setError("");
+
+      if (notificationSettings.enabled) {
+        notificationService.notifyReset({
+          locale: notificationSettings.locale,
+          tone: notificationSettings.tone,
+        });
+      }
     } catch (storageError) {
       setError(storageError.message);
     }

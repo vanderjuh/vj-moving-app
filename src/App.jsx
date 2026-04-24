@@ -83,6 +83,8 @@ export default function App() {
   const resolvedAppearance =
     appState.settings.appearance === "system" ? systemAppearance : appState.settings.appearance;
   const resolvedDensity = appState.settings.uiDensity || "compact";
+  const notificationTone = appState.settings.notificationTone || "soft";
+  const isDirectTone = notificationTone === "direct";
 
   const handleTabChange = (tab) => {
     setIsActionSheetOpen(false);
@@ -97,7 +99,9 @@ export default function App() {
         error={error}
         notice={notice}
         updateAction={applyPwaUpdate}
-        updateMessage={t("feedback.updateAvailable")}
+        updateMessage={
+          isDirectTone ? t("feedback.updateAvailableDirect") : t("feedback.updateAvailableSoft")
+        }
         updateLabel={t("feedback.updateNow")}
         t={t}
         onDismissError={actions.dismissError}
@@ -138,7 +142,7 @@ export default function App() {
             actions.completeAction(
               actionId,
               label,
-              t("feedback.completed"),
+              isDirectTone ? t("feedback.completedDirect") : t("feedback.completedSoft"),
               t("feedback.missingAction"),
             )
           }
@@ -153,7 +157,9 @@ export default function App() {
         <SettingsScreen
           settings={appState.settings}
           t={t}
-          onReset={() => actions.resetAppState(t("feedback.reset"))}
+          onReset={() =>
+            actions.resetAppState(isDirectTone ? t("feedback.resetDirect") : t("feedback.resetSoft"))
+          }
           onUpdateSettings={actions.updateSettings}
         />
       </div>
