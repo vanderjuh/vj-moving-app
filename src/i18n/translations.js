@@ -1,7 +1,7 @@
 const translations = {
   en: {
     app: {
-      name: "Pulse",
+      name: "TinyPush",
       currentState: "Current state",
       actionsTodayOne: "action today",
       actionsTodayOther: "actions today",
@@ -73,7 +73,7 @@ const translations = {
     },
     settings: {
       title: "Settings",
-      subtitle: "Tune Pulse to your taste.",
+      subtitle: "Tune TinyPush to your taste.",
       tabs: {
         context: "Context",
         preferences: "Preferences",
@@ -102,7 +102,7 @@ const translations = {
       profession: "Profession",
       professionLabel: "Your profession",
       professionPlaceholder: "Example: Nurse, Software Engineer, Teacher",
-      professionHint: "When you fill this field, Pulse unlocks work-hours fields and profession-based suggestions.",
+      professionHint: "When you fill this field, TinyPush unlocks work-hours fields and profession-based suggestions.",
       suggestionOrder: "Suggestion order",
       suggestionOrderHint: "Top to down: the first item is the suggestion type that appears first.",
       suggestionOrderPosition: "Priority {position}",
@@ -116,7 +116,7 @@ const translations = {
       workEnd: "End",
       workHoursHint: "Work-focused suggestions are shown during this time window.",
       reset: "Reset all data",
-      version: "Pulse · v1.0",
+      version: "TinyPush · v1.0",
     },
     feedback: {
       dismiss: "Dismiss",
@@ -139,7 +139,7 @@ const translations = {
   },
   pt: {
     app: {
-      name: "Pulse",
+      name: "TinyPush",
       currentState: "Estado atual",
       actionsTodayOne: "ação hoje",
       actionsTodayOther: "ações hoje",
@@ -211,7 +211,7 @@ const translations = {
     },
     settings: {
       title: "Ajustes",
-      subtitle: "Adapte o Pulse ao seu gosto.",
+      subtitle: "Adapte o TinyPush ao seu gosto.",
       tabs: {
         context: "Contexto",
         preferences: "Preferências",
@@ -240,7 +240,7 @@ const translations = {
       profession: "Profissão",
       professionLabel: "Sua profissão",
       professionPlaceholder: "Exemplo: Enfermeiro, Engenheiro de Software, Professor",
-      professionHint: "Ao preencher este campo, o Pulse libera os horários de trabalho e sugestões baseadas na profissão.",
+      professionHint: "Ao preencher este campo, o TinyPush libera os horários de trabalho e sugestões baseadas na profissão.",
       suggestionOrder: "Ordem das sugestões",
       suggestionOrderHint: "De cima para baixo: o primeiro item é o tipo de sugestão que aparece primeiro.",
       suggestionOrderPosition: "Prioridade {position}",
@@ -254,7 +254,7 @@ const translations = {
       workEnd: "Fim",
       workHoursHint: "Sugestões focadas em trabalho aparecem dentro dessa janela de horário.",
       reset: "Redefinir dados",
-      version: "Pulse · v1.0",
+      version: "TinyPush · v1.0",
     },
     feedback: {
       dismiss: "Fechar",

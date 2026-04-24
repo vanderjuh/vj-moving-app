@@ -65,8 +65,8 @@ export default function App() {
       setApplyPwaUpdate(() => nextApplyUpdate);
     };
 
-    window.addEventListener("pulse:pwa-update-ready", handlePwaUpdateReady);
-    return () => window.removeEventListener("pulse:pwa-update-ready", handlePwaUpdateReady);
+    window.addEventListener("tinypush:pwa-update-ready", handlePwaUpdateReady);
+    return () => window.removeEventListener("tinypush:pwa-update-ready", handlePwaUpdateReady);
   }, []);
 
   if (isLoading) {

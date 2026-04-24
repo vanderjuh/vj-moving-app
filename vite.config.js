@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["pwa-icon.svg", "pwa-maskable.svg"],
       manifest: {
-        name: "Pulse",
-        short_name: "Pulse",
+        name: "TinyPush",
+        short_name: "TinyPush",
         description: "Behavior activation app with local-first suggestions and offline support.",
         theme_color: "#090b10",
         background_color: "#090b10",

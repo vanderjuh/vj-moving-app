@@ -9,7 +9,7 @@ const updateSW = registerSW({
   immediate: true,
   onNeedRefresh() {
     window.dispatchEvent(
-      new CustomEvent("pulse:pwa-update-ready", {
+      new CustomEvent("tinypush:pwa-update-ready", {
         detail: {
           applyUpdate: () => updateSW(true),
         },
