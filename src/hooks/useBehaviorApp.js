@@ -13,6 +13,7 @@ export function useBehaviorApp() {
       notificationsEnabled: false,
       notificationTone: "soft",
       hapticsEnabled: false,
+      uiDensity: "compact",
       appearance: "system",
       locale: "en",
       goal: "",

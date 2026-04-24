@@ -82,6 +82,7 @@ export default function App() {
   const todayCount = countToday(appState.history);
   const resolvedAppearance =
     appState.settings.appearance === "system" ? systemAppearance : appState.settings.appearance;
+  const resolvedDensity = appState.settings.uiDensity || "compact";
 
   const handleTabChange = (tab) => {
     setIsActionSheetOpen(false);
@@ -90,7 +91,7 @@ export default function App() {
 
   return (
     <main
-      className={`phone-shell phone-shell--${appState.currentState.toLowerCase()} theme-${resolvedAppearance}`}
+      className={`phone-shell phone-shell--${appState.currentState.toLowerCase()} theme-${resolvedAppearance} ui-${resolvedDensity}`}
     >
       <FeedbackBanner
         error={error}

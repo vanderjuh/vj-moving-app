@@ -201,6 +201,19 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings }) {
 
       {activeTab === "preferences" ? (
         <>
+          <SettingsGroup title={t("settings.interface")}> 
+            <div className="settings-card appearance-card">
+              <SegmentedControl
+                options={[
+                  { id: "compact", label: t("settings.compact") },
+                  { id: "comfortable", label: t("settings.comfortable") },
+                ]}
+                value={settings.uiDensity || "compact"}
+                onChange={(uiDensity) => onUpdateSettings({ uiDensity })}
+              />
+            </div>
+          </SettingsGroup>
+
           <SettingsGroup title={t("settings.notifications")}>
             <div className="settings-card">
               <div className="settings-row">

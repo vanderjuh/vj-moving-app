@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS = {
   notificationsEnabled: false,
   notificationTone: "soft",
   hapticsEnabled: false,
+  uiDensity: "compact",
   appearance: "system",
   locale: detectLocale(),
   goal: "",
@@ -140,6 +141,9 @@ const normalizeSettings = (settings) => {
       typeof source.hapticsEnabled === "boolean"
         ? source.hapticsEnabled
         : DEFAULT_SETTINGS.hapticsEnabled,
+    uiDensity: ["compact", "comfortable"].includes(source.uiDensity)
+      ? source.uiDensity
+      : DEFAULT_SETTINGS.uiDensity,
     appearance: ["system", "light", "dark"].includes(source.appearance)
       ? source.appearance
       : DEFAULT_SETTINGS.appearance,
