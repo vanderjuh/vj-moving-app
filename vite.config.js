@@ -2,7 +2,10 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
+const base = process.env.VITE_BASE_PATH ?? "/";
+
 export default defineConfig({
+  base,
   plugins: [
     react(),
     VitePWA({
@@ -35,7 +38,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,png,ico,webmanifest}"],
-        navigateFallback: "/index.html",
+        navigateFallback: `${base}index.html`,
+        navigateFallbackAllowlist: [/^\/(?!assets\/)/],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
       },
