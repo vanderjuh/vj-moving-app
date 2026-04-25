@@ -59,6 +59,16 @@ export default function App() {
     return () => media.removeEventListener("change", updateAppearance);
   }, []);
 
+  const resolvedAppearance =
+    appState.settings.appearance === "system" ? systemAppearance : appState.settings.appearance;
+
+  useEffect(() => {
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]:not([media])');
+    if (!themeColorMeta) return;
+
+    themeColorMeta.setAttribute("content", resolvedAppearance === "light" ? "#f2eee4" : "#090b10");
+  }, [resolvedAppearance]);
+
   useEffect(() => {
     const handlePwaUpdateReady = (event) => {
       const nextApplyUpdate = event.detail?.applyUpdate;
@@ -81,8 +91,6 @@ export default function App() {
   };
   const isFirstUse = appState.history.length === 0 && appState.transitions.length === 0;
   const todayCount = countToday(appState.history);
-  const resolvedAppearance =
-    appState.settings.appearance === "system" ? systemAppearance : appState.settings.appearance;
   const resolvedDensity = appState.settings.uiDensity || "compact";
   const notificationTone = appState.settings.notificationTone || "soft";
   const isDirectTone = notificationTone === "direct";
