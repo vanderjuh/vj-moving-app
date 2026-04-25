@@ -1587,6 +1587,28 @@ button:focus-visible {
   width: 24px;
 }
 
+@supports (-webkit-touch-callout: none) {
+  @media (hover: none) and (pointer: coarse) {
+    .screen {
+      padding-bottom: calc(88px + env(safe-area-inset-bottom));
+    }
+
+    .phone-shell.ui-compact .screen {
+      padding-bottom: calc(78px + env(safe-area-inset-bottom));
+    }
+
+    .bottom-nav {
+      min-height: calc(84px + env(safe-area-inset-bottom));
+      padding: 10px 18px max(8px, env(safe-area-inset-bottom));
+    }
+
+    .phone-shell.ui-compact .bottom-nav {
+      min-height: calc(72px + env(safe-area-inset-bottom));
+      padding: 6px 14px max(6px, env(safe-area-inset-bottom));
+    }
+  }
+}
+
 @media (min-width: 431px) {
   body {
     padding: 8px 0;
