@@ -1,31 +1,13 @@
 import { startTransition, useEffect, useMemo, useRef, useState } from "react";
-import { DEFAULT_SUGGESTION_PRIORITY, getSuggestionsForContext } from "../data/suggestions";
+import { getSuggestionsForContext } from "../data/suggestions";
+import { APP_TIMERS, createDefaultAppState } from "../config/appSettings";
 import { notificationService } from "../services/notificationService";
 import { behaviorStorage } from "../services/behaviorStorage";
 
-const STATE_REFRESH_MS = 30 * 1000;
+const STATE_REFRESH_MS = APP_TIMERS.stateRefreshMs;
 
 export function useBehaviorApp() {
-  const [appState, setAppState] = useState({
-    currentState: "STOPPED",
-    history: [],
-    transitions: [],
-    settings: {
-      notificationsEnabled: false,
-      notificationTone: "soft",
-      hapticsEnabled: false,
-      uiDensity: "compact",
-      appearance: "system",
-      locale: "en",
-      goal: "",
-      profession: "",
-      suggestionPriority: DEFAULT_SUGGESTION_PRIORITY,
-      workHours: {
-        start: "09:00",
-        end: "18:00",
-      },
-    },
-  });
+  const [appState, setAppState] = useState(() => createDefaultAppState());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -71,6 +53,8 @@ export function useBehaviorApp() {
         goal: appState.settings.goal,
         locale: appState.settings.locale,
         profession: appState.settings.profession,
+        history: appState.history,
+        recentWindowMs: APP_TIMERS.activeWindowMs,
         suggestionPriority: appState.settings.suggestionPriority,
         workHours: appState.settings.workHours,
       }),
@@ -188,6 +172,20 @@ export function useBehaviorApp() {
     });
   };
 
+  const archiveHistoryItem = (historyItem, successMessage, failureMessage) => {
+    setAppState((current) => {
+      try {
+        const nextState = behaviorStorage.archiveHistoryItem(historyItem, current);
+        setNotice(successMessage || "");
+        setError("");
+        return nextState;
+      } catch (storageError) {
+        setError(failureMessage || storageError.message);
+        return current;
+      }
+    });
+  };
+
   const exportData = (successMessage, failureMessage) => {
     try {
       const snapshot = behaviorStorage.exportAppState(appState);
@@ -245,6 +243,7 @@ export function useBehaviorApp() {
     completedActionId,
     actions: {
       completeAction,
+      archiveHistoryItem,
       updateSettings,
       resetAppState,
       exportData,

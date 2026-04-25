@@ -13,6 +13,7 @@ export function SuggestionList({
   onComplete,
 }) {
   const [query, setQuery] = useState("");
+  const [keyboardInset, setKeyboardInset] = useState(0);
   const currentPeriod = getDayPeriod(new Date());
   const normalizedQuery = query.trim().toLowerCase();
   const getSuggestionLabel = (suggestion) => suggestion.labels?.[locale] || suggestion.label;
@@ -33,11 +34,34 @@ export function SuggestionList({
     [locale, normalizedQuery, orderedSuggestions],
   );
   const canAddCustomAction = normalizedQuery.length > 0 && visibleSuggestions.length === 0;
+  const showRecentCooldownState = normalizedQuery.length === 0 && visibleSuggestions.length === 0;
 
   useEffect(() => {
     if (!isOpen) {
       setQuery("");
+      setKeyboardInset(0);
     }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || typeof window === "undefined" || !window.visualViewport) {
+      return undefined;
+    }
+
+    const viewport = window.visualViewport;
+    const updateKeyboardInset = () => {
+      const nextInset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+      setKeyboardInset(nextInset);
+    };
+
+    updateKeyboardInset();
+    viewport.addEventListener("resize", updateKeyboardInset);
+    viewport.addEventListener("scroll", updateKeyboardInset);
+
+    return () => {
+      viewport.removeEventListener("resize", updateKeyboardInset);
+      viewport.removeEventListener("scroll", updateKeyboardInset);
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -49,6 +73,11 @@ export function SuggestionList({
         role="dialog"
         aria-modal="true"
         aria-labelledby="suggestions-title"
+        style={{
+          "--keyboard-inset": `${keyboardInset}px`,
+          "--sheet-list-padding-bottom":
+            keyboardInset > 0 ? "calc(18px + env(safe-area-inset-bottom))" : "calc(104px + env(safe-area-inset-bottom))",
+        }}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="sheet-handle" aria-hidden="true" />
@@ -67,7 +96,6 @@ export function SuggestionList({
         <label className="suggestion-search">
           <span className="sr-only">{t("suggestions.searchPlaceholder")}</span>
           <input
-            autoFocus
             type="search"
             value={query}
             placeholder={t("suggestions.searchPlaceholder")}
@@ -89,7 +117,7 @@ export function SuggestionList({
                 <div>
                   <div className="suggestion-main">
                     <span className="suggestion-prefix-icon">{getSuggestionIcon(suggestion)}</span>
-                    <p>{label}</p>
+                    <p title={label}>{label}</p>
                   </div>
                 </div>
                 <button
@@ -110,7 +138,7 @@ export function SuggestionList({
           {canAddCustomAction ? (
             <article className="suggestion-card custom-action-card">
               <div>
-                <p>{query.trim()}</p>
+                <p title={query.trim()}>{query.trim()}</p>
               </div>
               <button
                 className="add-action-button"
@@ -123,6 +151,13 @@ export function SuggestionList({
               >
                 +
               </button>
+            </article>
+          ) : null}
+
+          {showRecentCooldownState ? (
+            <article className="suggestion-empty-state" role="status" aria-live="polite">
+              <p>{t("suggestions.cooldownTitle")}</p>
+              <span>{t("suggestions.cooldownHint")}</span>
             </article>
           ) : null}
         </div>

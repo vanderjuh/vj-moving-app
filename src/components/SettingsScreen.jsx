@@ -1,6 +1,25 @@
 import { useEffect, useRef, useState } from "react";
-import { Bell, Download, Smartphone, Trash2, Upload } from "lucide-react";
-import { featureFlags } from "../config/featureFlags";
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Bell, Download, GripVertical, Trash2, Upload } from "lucide-react";
+import { SETTINGS_LIMITS } from "../config/appSettings";
+import { featureFlags } from "../config/appSettings";
 import { getProfessionOptions, resolveProfessionLabels } from "../data/professions";
 import { DEFAULT_SUGGESTION_PRIORITY, SUGGESTION_PRIORITY_TYPES } from "../data/suggestions";
 
@@ -43,6 +62,40 @@ function SettingsGroup({ title, children }) {
       <h2>{title}</h2>
       {children}
     </section>
+  );
+}
+
+function SortablePriorityItem({ itemId, index, t }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: itemId,
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+  const label = t(`settings.suggestionType.${itemId}`);
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className={`suggestion-order-item ${isDragging ? "is-dragging" : ""}`}
+    >
+      <div className="suggestion-order-item-copy">
+        <span>{t("settings.suggestionOrderPosition", { position: index + 1 })}</span>
+        <strong>{label}</strong>
+      </div>
+
+      <button
+        type="button"
+        className="suggestion-order-drag-handle"
+        aria-label={t("settings.suggestionOrderDragItem", { item: label })}
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical aria-hidden="true" />
+      </button>
+    </li>
   );
 }
 
@@ -89,11 +142,18 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings, onExpor
     onUpdateSettings({ suggestionPriority });
   }, [onUpdateSettings, settings.suggestionPriority, suggestionPriority]);
 
-  const handleSuggestionPriorityChange = (position, value) => {
-    const current = suggestionPriority.filter((item) => SUGGESTION_PRIORITY_TYPES.includes(item));
-    const withoutSelected = current.filter((item) => item !== value);
-    withoutSelected.splice(position, 0, value);
-    onUpdateSettings({ suggestionPriority: withoutSelected });
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const handleSuggestionPriorityDragEnd = ({ active, over }) => {
+    if (!over || active.id === over.id) return;
+    const oldIndex = suggestionPriority.indexOf(active.id);
+    const newIndex = suggestionPriority.indexOf(over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    onUpdateSettings({ suggestionPriority: arrayMove(suggestionPriority, oldIndex, newIndex) });
   };
 
   const handleExportData = () => {
@@ -140,7 +200,7 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings, onExpor
                     className="objective-input"
                     value={settings.goal || ""}
                     placeholder={t("settings.objectivePlaceholder")}
-                    maxLength={180}
+                    maxLength={SETTINGS_LIMITS.goalMaxLength}
                     onChange={(event) => onUpdateSettings({ goal: event.target.value })}
                   />
                 </label>
@@ -159,7 +219,7 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings, onExpor
                   list={`top-professions-${settings.locale}`}
                   value={localizedProfessionValue}
                   placeholder={t("settings.professionPlaceholder")}
-                  maxLength={80}
+                  maxLength={SETTINGS_LIMITS.professionMaxLength}
                   onChange={(event) => onUpdateSettings({ profession: event.target.value })}
                 />
                 <datalist id={`top-professions-${settings.locale}`}>
@@ -216,23 +276,29 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings, onExpor
           <SettingsGroup title={t("settings.suggestionOrder")}>
             <div className="settings-card suggestion-order-card">
               <p>{t("settings.suggestionOrderHint")}</p>
-              <div className="suggestion-order-list">
-                {suggestionPriority.map((priorityType, index) => (
-                  <label className="suggestion-order-field" key={`priority-${index}`}>
-                    <span>{t("settings.suggestionOrderPosition", { position: index + 1 })}</span>
-                    <select
-                      value={priorityType}
-                      onChange={(event) => handleSuggestionPriorityChange(index, event.target.value)}
-                    >
-                      {SUGGESTION_PRIORITY_TYPES.map((type) => (
-                        <option key={type} value={type}>
-                          {t(`settings.suggestionType.${type}`)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                ))}
-              </div>
+              <p className="suggestion-order-drag-hint">{t("settings.suggestionOrderDragHint")}</p>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+                onDragEnd={handleSuggestionPriorityDragEnd}
+              >
+                <SortableContext
+                  items={suggestionPriority}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <ul className="suggestion-order-dnd-list">
+                    {suggestionPriority.map((priorityType, index) => (
+                      <SortablePriorityItem
+                        key={priorityType}
+                        itemId={priorityType}
+                        index={index}
+                        t={t}
+                      />
+                    ))}
+                  </ul>
+                </SortableContext>
+              </DndContext>
             </div>
           </SettingsGroup>
         </>
@@ -276,22 +342,6 @@ export function SettingsScreen({ settings, t, onReset, onUpdateSettings, onExpor
                   ]}
                   value={settings.notificationTone}
                   onChange={(notificationTone) => onUpdateSettings({ notificationTone })}
-                />
-              </div>
-            </div>
-          </SettingsGroup>
-
-          <SettingsGroup title={t("settings.feedback")}>
-            <div className="settings-card single-row-card">
-              <div className="settings-row">
-                <span className="settings-icon">
-                  <Smartphone aria-hidden="true" />
-                </span>
-                <strong>{t("settings.haptics")}</strong>
-                <Toggle
-                  checked={settings.hapticsEnabled}
-                  label={t("settings.enableHaptics")}
-                  onChange={(hapticsEnabled) => onUpdateSettings({ hapticsEnabled })}
                 />
               </div>
             </div>
