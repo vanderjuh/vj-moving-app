@@ -4,36 +4,21 @@ import {
   SUGGESTION_PRIORITY_TYPES,
   SUGGESTIONS_BY_STATE,
 } from "../data/suggestions";
-import { detectLocale } from "../i18n/translations";
+import {
+  APP_TIMERS,
+  SETTINGS_LIMITS,
+  createDefaultAppState,
+  createDefaultSettings,
+} from "../config/appSettings";
 
 export const STORAGE_KEY = "behavior_app_v1";
 
-const DEFAULT_SETTINGS = {
-  notificationsEnabled: false,
-  notificationTone: "soft",
-  hapticsEnabled: false,
-  uiDensity: "compact",
-  appearance: "system",
-  locale: detectLocale(),
-  goal: "",
-  profession: "",
-  suggestionPriority: DEFAULT_SUGGESTION_PRIORITY,
-  workHours: {
-    start: "09:00",
-    end: "18:00",
-  },
-};
-
-const DEFAULT_STATE = {
-  currentState: "STOPPED",
-  history: [],
-  transitions: [],
-  settings: DEFAULT_SETTINGS,
-};
+const DEFAULT_SETTINGS = createDefaultSettings();
+const getDefaultState = () => createDefaultAppState();
 let memoryStateFallback = null;
 
-const ACTIVE_WINDOW_MS = 15 * 60 * 1000;
-const NEUTRAL_WINDOW_MS = 60 * 60 * 1000;
+export const ACTIVE_WINDOW_MS = APP_TIMERS.activeWindowMs;
+const NEUTRAL_WINDOW_MS = APP_TIMERS.neutralWindowMs;
 
 const isBrowserStorageAvailable = () => {
   try {
@@ -47,7 +32,7 @@ const isBrowserStorageAvailable = () => {
 };
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
-memoryStateFallback = clone(DEFAULT_STATE);
+memoryStateFallback = clone(getDefaultState());
 
 const timestamp = () => new Date().toISOString();
 
@@ -148,8 +133,8 @@ const normalizeSettings = (settings) => {
       ? source.appearance
       : DEFAULT_SETTINGS.appearance,
     locale: ["pt", "en"].includes(source.locale) ? source.locale : DEFAULT_SETTINGS.locale,
-    goal: goal.slice(0, 180),
-    profession: profession.slice(0, 80),
+    goal: goal.slice(0, SETTINGS_LIMITS.goalMaxLength),
+    profession: profession.slice(0, SETTINGS_LIMITS.professionMaxLength),
     suggestionPriority,
     workHours: {
       start,
@@ -160,7 +145,7 @@ const normalizeSettings = (settings) => {
 
 const normalizeAppState = (data) => {
   if (!data || typeof data !== "object" || Array.isArray(data)) {
-    return clone(DEFAULT_STATE);
+    return clone(getDefaultState());
   }
 
   const history = Array.isArray(data.history) ? data.history.filter(isHistoryItem) : [];
@@ -207,10 +192,10 @@ const readRawState = () => {
   const raw = window.localStorage.getItem(STORAGE_KEY);
 
   if (!raw) {
-    const safeDefaultState = clone(DEFAULT_STATE);
+    const safeDefaultState = clone(getDefaultState());
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(safeDefaultState));
     memoryStateFallback = safeDefaultState;
-    return { data: clone(DEFAULT_STATE), warning: "" };
+    return { data: clone(getDefaultState()), warning: "" };
   }
 
   try {
@@ -219,11 +204,11 @@ const readRawState = () => {
     memoryStateFallback = clone(data);
     return { data, warning: "" };
   } catch {
-    const safeDefaultState = clone(DEFAULT_STATE);
+    const safeDefaultState = clone(getDefaultState());
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(safeDefaultState));
     memoryStateFallback = safeDefaultState;
     return {
-      data: clone(DEFAULT_STATE),
+      data: clone(getDefaultState()),
       warning: "Saved data was corrupted and has been reset safely.",
     };
   }
@@ -312,6 +297,39 @@ export const behaviorStorage = {
     return writeRawState(nextState);
   },
 
+  archiveHistoryItem(historyItem, baseState) {
+    const sourceState = baseState ? withDerivedState(baseState) : readRawState().data;
+    const targetActionId = typeof historyItem?.actionId === "string" ? historyItem.actionId : "";
+    const targetTimestamp = typeof historyItem?.timestamp === "string" ? historyItem.timestamp : "";
+
+    if (!targetActionId || !targetTimestamp) {
+      throw new Error("Invalid history item.");
+    }
+
+    let wasArchived = false;
+    const nextHistory = sourceState.history.map((item) => {
+      const isTarget = item.actionId === targetActionId && item.timestamp === targetTimestamp;
+      if (!isTarget || item.archivedAt) {
+        return item;
+      }
+
+      wasArchived = true;
+      return {
+        ...item,
+        archivedAt: timestamp(),
+      };
+    });
+
+    if (!wasArchived) {
+      throw new Error("History item was not found.");
+    }
+
+    return writeRawState({
+      ...sourceState,
+      history: nextHistory,
+    });
+  },
+
   changeState(newState, baseState) {
     if (!isValidState(newState)) {
       throw new Error("Selected state is invalid.");
@@ -369,6 +387,6 @@ export const behaviorStorage = {
   },
 
   resetAppState() {
-    return writeRawState(DEFAULT_STATE);
+    return writeRawState(getDefaultState());
   },
 };

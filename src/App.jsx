@@ -6,6 +6,7 @@ import { LoadingState } from "./components/LoadingState";
 import { OnboardingHint } from "./components/OnboardingHint";
 import { SettingsScreen } from "./components/SettingsScreen";
 import { SuggestionList } from "./components/SuggestionList";
+import { APP_TIMERS } from "./config/appSettings";
 import { STATE_META } from "./data/suggestions";
 import { useBehaviorApp } from "./hooks/useBehaviorApp";
 import { createTranslator, detectLocale } from "./i18n/translations";
@@ -99,6 +100,9 @@ export default function App() {
       <FeedbackBanner
         error={error}
         notice={notice}
+        noticeAutoDismissMs={
+          isDirectTone ? APP_TIMERS.noticeAutoDismissMs.direct : APP_TIMERS.noticeAutoDismissMs.soft
+        }
         updateAction={notificationsEnabled ? applyPwaUpdate : null}
         updateMessage={
           isDirectTone ? t("feedback.updateAvailableDirect") : t("feedback.updateAvailableSoft")
@@ -151,7 +155,19 @@ export default function App() {
       </section>
 
       <section className="screen history-screen" hidden={activeTab !== "history"}>
-        <HistoryPanel history={appState.history} locale={locale} t={t} transitions={appState.transitions} />
+        <HistoryPanel
+          history={appState.history}
+          locale={locale}
+          t={t}
+          transitions={appState.transitions}
+          onArchiveItem={(item) =>
+            actions.archiveHistoryItem(
+              item,
+              isDirectTone ? t("feedback.historyItemArchivedDirect") : t("feedback.historyItemArchivedSoft"),
+              t("feedback.historyItemArchiveError"),
+            )
+          }
+        />
       </section>
 
       <div hidden={activeTab !== "settings"}>

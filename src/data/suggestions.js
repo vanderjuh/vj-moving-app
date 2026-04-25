@@ -1,5 +1,5 @@
 import { getProfessionSuggestions } from "./professions";
-import { featureFlags } from "../config/featureFlags";
+import { featureFlags } from "../config/appSettings";
 
 export const STATES = ["STOPPED", "NEUTRAL", "ACTIVE"];
 export const SUGGESTION_PRIORITY_TYPES = featureFlags.goalEnabled
@@ -334,6 +334,8 @@ export const getSuggestionsForContext = ({
   goal = "",
   locale = "en",
   profession = "",
+  history = [],
+  recentWindowMs = 15 * 60 * 1000,
   workHours = { start: "09:00", end: "18:00" },
   suggestionPriority = DEFAULT_SUGGESTION_PRIORITY,
   now = new Date(),
@@ -367,10 +369,21 @@ export const getSuggestionsForContext = ({
 
   const orderedGroups = priorityOrder.flatMap((type) => suggestionsByType[type] || []);
   const allSuggestions = [...orderedGroups, ...base];
+  const nowMs = now.getTime();
+  const recentActionIds = new Set(
+    (Array.isArray(history) ? history : [])
+      .filter((item) => item && typeof item.actionId === "string" && typeof item.timestamp === "string")
+      .filter((item) => {
+        const age = nowMs - new Date(item.timestamp).getTime();
+        return Number.isFinite(age) && age >= 0 && age <= recentWindowMs;
+      })
+      .map((item) => item.actionId),
+  );
 
   const seen = new Set();
   return allSuggestions.filter((item) => {
     if (seen.has(item.id)) return false;
+    if (recentActionIds.has(item.id)) return false;
     seen.add(item.id);
     return true;
   });

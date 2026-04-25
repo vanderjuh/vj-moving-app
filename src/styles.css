@@ -241,7 +241,7 @@ button:focus-visible {
   display: grid;
   grid-template-rows: auto auto auto minmax(0, 1fr);
   gap: 14px;
-  max-height: min(68svh, 580px);
+  max-height: min(calc(80dvh - var(--keyboard-inset, 0px)), 680px);
   overflow: hidden;
   padding: 10px 22px max(24px, env(safe-area-inset-bottom));
   border: 1px solid var(--line);
@@ -323,24 +323,24 @@ button:focus-visible {
 
 .suggestion-list {
   display: grid;
-  gap: 12px;
+  gap: 10px;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 0 2px calc(104px + env(safe-area-inset-bottom));
+  padding: 0 2px var(--sheet-list-padding-bottom, calc(104px + env(safe-area-inset-bottom)));
   scrollbar-width: thin;
 }
 
 .suggestion-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 46px;
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
   align-items: center;
-  min-height: 76px;
-  padding: 12px 12px 12px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.075);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.065);
+  min-height: 72px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   animation: card-in 420ms ease both;
   animation-delay: var(--delay);
@@ -359,25 +359,30 @@ button:focus-visible {
 .suggestion-card p {
   margin: 0;
   color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  hyphens: auto;
   overflow-wrap: anywhere;
-  font-size: 0.92rem;
-  font-weight: 720;
-  line-height: 1.28;
+  font-size: 0.95rem;
+  font-weight: 680;
+  line-height: 1.34;
 }
 
 .suggestion-main {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  gap: 10px;
-  align-items: start;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
 }
 
 .suggestion-prefix-icon {
   display: grid;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   place-items: center;
-  margin-top: 1px;
   border-radius: 999px;
   color: var(--soft);
   background: rgba(255, 255, 255, 0.05);
@@ -404,16 +409,52 @@ button:focus-visible {
 
 .suggestion-card .add-action-button {
   display: grid;
-  width: 44px;
-  height: 44px;
-  min-height: 44px;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
   place-items: center;
-  font-size: 1.75rem;
+  font-size: 1.55rem;
   line-height: 1;
 }
 
 .custom-action-card {
   border-color: rgba(138, 215, 176, 0.24);
+}
+
+.custom-action-card p {
+  -webkit-line-clamp: 3;
+}
+
+.suggestion-empty-state {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border: 1px dashed var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.suggestion-empty-state p {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.94rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.suggestion-empty-state span {
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.3;
+}
+
+.theme-light .suggestion-card {
+  border-color: rgba(31, 33, 38, 0.12);
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.theme-light .suggestion-prefix-icon {
+  background: rgba(23, 24, 29, 0.08);
 }
 
 .feedback-stack {
@@ -441,6 +482,10 @@ button:focus-visible {
 
 .feedback--error {
   border-color: rgba(216, 104, 85, 0.5);
+}
+
+.feedback--success.is-leaving {
+  animation: toast-out 240ms ease both;
 }
 
 .feedback button {
@@ -523,6 +568,39 @@ button:focus-visible {
   border: 1px solid var(--line);
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.055);
+}
+
+.history-list li {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.history-item-main {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.history-remove-button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.history-remove-button svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
 }
 
 .history-list div {
@@ -1001,6 +1079,76 @@ button:focus-visible {
   gap: 10px;
 }
 
+.suggestion-order-dnd-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suggestion-order-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.suggestion-order-item.is-dragging {
+  opacity: 0.75;
+  border-color: rgba(203, 187, 138, 0.45);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.suggestion-order-item-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.suggestion-order-item-copy span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.suggestion-order-item-copy strong {
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 760;
+}
+
+.suggestion-order-drag-handle {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+  touch-action: none;
+}
+
+.suggestion-order-drag-handle svg {
+  width: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+}
+
+.suggestion-order-drag-hint {
+  margin-top: -2px;
+}
+
 .suggestion-order-field {
   display: grid;
   gap: 8px;
@@ -1031,13 +1179,14 @@ button:focus-visible {
 
 .work-hours-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 10px;
 }
 
 .work-time-field {
   display: grid;
   gap: 8px;
+  min-width: 0;
 }
 
 .work-time-field span {
@@ -1049,6 +1198,8 @@ button:focus-visible {
 
 .work-time-field input {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 44px;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -1208,6 +1359,18 @@ button:focus-visible {
   }
 }
 
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -1289,20 +1452,20 @@ button:focus-visible {
 }
 
 .phone-shell.ui-compact .suggestion-card {
-  min-height: 66px;
+  min-height: 62px;
   padding: 10px;
   border-radius: 18px;
 }
 
 .phone-shell.ui-compact .suggestion-card p {
-  font-size: 0.86rem;
+  font-size: 0.89rem;
 }
 
 .phone-shell.ui-compact .suggestion-card .add-action-button {
-  width: 38px;
-  height: 38px;
-  min-height: 38px;
-  font-size: 1.45rem;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  font-size: 1.35rem;
 }
 
 .phone-shell.ui-compact .history-list,
@@ -1316,6 +1479,12 @@ button:focus-visible {
   gap: 8px;
   padding: 12px;
   border-radius: 18px;
+}
+
+.phone-shell.ui-compact .history-remove-button {
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
 }
 
 .phone-shell.ui-compact .settings-screen {
@@ -1376,6 +1545,10 @@ button:focus-visible {
 .phone-shell.ui-compact .appearance-card {
   gap: 10px;
   padding: 14px;
+}
+
+.phone-shell.ui-compact .work-hours-grid {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .phone-shell.ui-compact .data-action-button {

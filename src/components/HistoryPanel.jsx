@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Trash2 } from "lucide-react";
+import { HISTORY_SETTINGS } from "../config/appSettings";
 
-const INITIAL_VISIBLE_COUNT = 80;
-const PAGE_SIZE = 80;
+const INITIAL_VISIBLE_COUNT = HISTORY_SETTINGS.initialVisibleCount;
+const PAGE_SIZE = HISTORY_SETTINGS.pageSize;
 
 const formatTime = (value, locale) =>
   new Intl.DateTimeFormat(locale === "pt" ? "pt-BR" : "en", {
@@ -12,9 +13,10 @@ const formatTime = (value, locale) =>
     minute: "2-digit",
   }).format(new Date(value));
 
-export function HistoryPanel({ history, locale, t, transitions }) {
+export function HistoryPanel({ history, locale, t, transitions, onArchiveItem }) {
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
-  const visibleHistory = history.slice(0, visibleCount);
+  const visibleItems = history.filter((item) => !item.archivedAt);
+  const visibleHistory = visibleItems.slice(0, visibleCount);
 
   return (
     <section className="history-panel">
@@ -23,7 +25,7 @@ export function HistoryPanel({ history, locale, t, transitions }) {
         <p>{t("history.subtitle")}</p>
       </div>
 
-      {history.length === 0 ? (
+      {visibleItems.length === 0 ? (
         <div className="empty-history">
           <div className="empty-icon" aria-hidden="true">
             <Sparkles aria-hidden="true" />
@@ -36,24 +38,35 @@ export function HistoryPanel({ history, locale, t, transitions }) {
           <ol className="history-list">
             {visibleHistory.map((item) => (
               <li key={`${item.actionId}-${item.timestamp}`}>
-                <span className={`state-pill state-pill--${item.state.toLowerCase()}`}>
-                  {t(`state.${item.state}.label`)}
-                </span>
-                <div>
-                  <strong>{item.label}</strong>
-                  <time dateTime={item.timestamp}>{formatTime(item.timestamp, locale)}</time>
+                <div className="history-item-main">
+                  <span className={`state-pill state-pill--${item.state.toLowerCase()}`}>
+                    {t(`state.${item.state}.label`)}
+                  </span>
+                  <div>
+                    <strong>{item.label}</strong>
+                    <time dateTime={item.timestamp}>{formatTime(item.timestamp, locale)}</time>
+                  </div>
                 </div>
+
+                <button
+                  className="history-remove-button"
+                  type="button"
+                  aria-label={t("history.archiveAction")}
+                  onClick={() => onArchiveItem(item)}
+                >
+                  <Trash2 aria-hidden="true" />
+                </button>
               </li>
             ))}
           </ol>
-          {visibleCount < history.length ? (
+          {visibleCount < visibleItems.length ? (
             <button
               className="load-more-button"
               type="button"
               onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
             >
               {t("history.showMore", {
-                count: Math.min(PAGE_SIZE, history.length - visibleCount),
+                count: Math.min(PAGE_SIZE, visibleItems.length - visibleCount),
               })}
             </button>
           ) : null}
